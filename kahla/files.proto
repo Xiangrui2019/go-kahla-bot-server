@@ -1,0 +1,60 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+
+service Files {
+    rpc UploadIcon (Files_UploadIconRequest) returns (Files_UploadIconResponse) {
+        option (rest.method) = POST;
+        option (rest.request_content_type) = MULTIPART_FORM_DATA;
+    }
+    rpc UploadMedia (Files_UploadMediaRequest) returns (Files_UploadMediaResponse) {
+        option (rest.method) = POST;
+        option (rest.request_content_type) = MULTIPART_FORM_DATA;
+    }
+    rpc UploadFile (Files_UploadFileRequest) returns (Files_UploadFileResponse) {
+        option (rest.method) = POST;
+        option (rest.request_content_type) = MULTIPART_FORM_DATA;
+    }
+    rpc FileDownloadAddress (Files_FileDownloadAddressRequest) returns (Files_FileDownloadAddressResponse) {
+        option (rest.method) = POST;
+    }
+}
+message Files_UploadIconRequest {
+    rest.RequestFile File = 1;
+}
+message Files_UploadIconResponse {
+    sint32 code = 1;
+    string message = 2;
+    uint32 fileKey = 3;
+    string downloadPath = 4;
+}
+message Files_UploadMediaRequest {
+    rest.RequestFile File = 1;
+}
+message Files_UploadMediaResponse {
+    sint32 code = 1;
+    string message = 2;
+    string fileKey = 3;
+    string downloadPath = 4;
+}
+message Files_UploadFileRequest {
+    uint32 ConversationId = 1 [(rest.field_method) = GET];
+    rest.RequestFile File = 2;
+}
+message Files_UploadFileResponse {
+    sint32 code = 1;
+    string message = 2;
+    string savedFileName = 3;
+    uint32 fileKey = 4;
+    uint64 fileSize = 5;
+}
+message Files_FileDownloadAddressRequest {
+    uint32 FileKey = 1;
+}
+message Files_FileDownloadAddressResponse {
+    sint32 code = 1;
+    string message = 2;
+    string fileName = 3;
+    string downloadPath = 4;
+}

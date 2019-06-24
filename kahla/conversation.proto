@@ -1,0 +1,183 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+
+service Conversation {
+    rpc All (Conversation_AllRequest) returns (Conversation_AllResponse);
+    rpc GetMessage (Conversation_GetMessageRequest) returns (Conversation_GetMessageResponse);
+    rpc SendMessage (Conversation_SendMessageRequest) returns (Conversation_SendMessageResponse) {
+        option (rest.method) = POST;
+    };
+    rpc ConversationDetail (Conversation_ConversationDetailRequest) returns (Conversation_ConversationDetailResponse);
+    rpc UpdateMessageLifeTime (Conversation_UpdateMessageLifeTimeRequest) returns (Conversation_UpdateMessageLifeTimeResponse) {
+        option (rest.method) = POST;
+    };
+}
+enum Conversation_Discriminator {
+    PrivateConversation = 0;
+    GroupConversation = 1;
+}
+message Conversation_AllRequest {
+    uint32 Take = 1;
+    uint32 Skip = 2;
+}
+message Conversation_AllResponse {
+    sint32 code = 1;
+    string message = 2;
+    repeated Item items = 3;
+    message Item {
+        string displayName = 1;
+        uint32 displayImageKey = 2;
+        string latestMessage = 3;
+        string latestMessageTime = 4;
+        uint32 unReadAmount = 5;
+        uint32 conversationId = 6;
+        string discriminator = 7;
+        // null when GroupConversation
+        string userId = 8;
+        string aesKey = 9;
+        bool muted = 10;
+        bool someoneAtMe = 11;
+    }
+}
+message Conversation_GetMessageRequest {
+    uint32 id = 1;
+    int32 skipTill = 2;
+    uint32 take = 3;
+}
+message Conversation_GetMessageResponse {
+    sint32 code = 1;
+    string message = 2;
+    repeated Item items = 3;
+    message Item {
+        uint32 id = 1;
+        uint32 conversationId = 2;
+        repeated At ats = 3;
+        string senderId = 4;
+        Sender sender = 5;
+        string sendTime = 6;
+        string content = 7;
+        bool read = 8;
+        message At {
+            string targetUserId = 1;
+        }
+        message Sender {
+            bool makeEmailPublic = 1;
+            string email = 2;
+            string id = 3;
+            string bio = 4;
+            string nickName = 5;
+            string sex = 6;
+            uint32 headImgFileKey = 7;
+            string preferedLanguage = 8;
+            string accountCreateTime = 9;
+            bool emailConfirmed = 10;
+        }
+    }
+}
+message Conversation_SendMessageRequest {
+    uint32 Id = 1;
+    string Content = 2;
+    repeated string At = 3;
+}
+message Conversation_SendMessageResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Conversation_ConversationDetailRequest {
+    uint32 id = 1;
+}
+message Conversation_ConversationDetailResponse {
+    sint32 code = 1;
+    string message = 2;
+    Value value = 3;
+    message Value {
+        // For GroupConversation
+        repeated User users = 1;
+        // For GroupConversation
+        uint32 groupImageKey = 2;
+        // For GroupConversation
+        string groupName = 3;
+        // For GroupConversation
+        bool hasPassword = 4;
+        // For GroupConversation
+        string ownerId = 5;
+        // For PrivateConversation
+        string requesterId = 13;
+        // For PrivateConversation
+        RequestUser requestUser = 14;
+        // For PrivateConversation
+        string targetId = 15;
+        // For PrivateConversation
+        TargetUser targetUser = 16;
+        // For PrivateConversation
+        string anotherUserId = 17;
+        // For GroupConversation, PrivateConversation
+        uint32 id = 6;
+        // For GroupConversation, PrivateConversation
+        string discriminator = 7;
+        // For GroupConversation, PrivateConversation
+        string aesKey = 8;
+        // For GroupConversation, PrivateConversation
+        uint32 maxLiveSeconds = 9;
+        // For GroupConversation, PrivateConversation
+        string conversationCreateTime = 10;
+        // For GroupConversation, PrivateConversation
+        string displayName = 11;
+        // For GroupConversation, PrivateConversation
+        uint32 displayImage = 12;
+        message User {
+            uint32 id = 1;
+            string joinTime = 2;
+            bool muted = 3;
+            User user = 4;
+            uint32 groupId = 5;
+            string readTimeStamp = 6;
+            message User {
+                bool makeEmailPublic = 1;
+                string email = 2;
+                string id = 3;
+                string bio = 4;
+                string nickName = 5;
+                string sex = 6;
+                uint32 headImgFileKey = 7;
+                string preferedLanguage = 8;
+                string accountCreateTime = 9;
+                bool emailConfirmed = 10;
+            }
+        }
+        message RequestUser {
+            bool makeEmailPublic = 1;
+            string email = 2;
+            string id = 3;
+            string bio = 4;
+            string nickName = 5;
+            string sex = 6;
+            uint32 headImgFileKey = 7;
+            string preferedLanguage = 8;
+            string accountCreateTime = 9;
+            bool emailConfirmed = 10;
+        }
+        message TargetUser {
+            bool makeEmailPublic = 1;
+            string email = 2;
+            string id = 3;
+            string bio = 4;
+            string nickName = 5;
+            string sex = 6;
+            uint32 headImgFileKey = 7;
+            string preferedLanguage = 8;
+            string accountCreateTime = 9;
+            bool emailConfirmed = 10;
+        }
+    }
+}
+message Conversation_UpdateMessageLifeTimeRequest {
+    uint32 Id = 1;
+    uint32 NewLifeTime = 2;
+}
+message Conversation_UpdateMessageLifeTimeResponse {
+    sint32 code = 1;
+    string message = 2;
+}

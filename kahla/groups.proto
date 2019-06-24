@@ -1,0 +1,96 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+
+service Groups {
+    rpc CreateGroupConversation (Groups_CreateGroupConversationRequest) returns (Groups_CreateGroupConversationResponse) {
+        option (rest.method) = POST;
+    };
+    rpc JoinGroup (Groups_JoinGroupRequest) returns (Groups_JoinGroupResponse) {
+        option (rest.method) = POST;
+    };
+    rpc TransferGroupOwner (Groups_TransferGroupOwnerRequest) returns (Groups_TransferGroupOwnerResponse) {
+        option (rest.method) = POST;
+    };
+    rpc KickMember (Groups_KickMemberRequest) returns (Groups_KickMemberResponse) {
+        option (rest.method) = POST;
+    };
+    rpc DissolveGroup (Groups_DissolveGroupRequest) returns (Groups_DissolveGroupResponse) {
+        option (rest.method) = POST;
+    };
+    rpc LeaveGroup (Groups_LeaveGroupRequest) returns (Groups_LeaveGroupResponse) {
+        option (rest.method) = POST;
+    };
+    rpc SetGroupMuted (Groups_SetGroupMutedRequest) returns (Groups_SetGroupMutedResponse) {
+        option (rest.method) = POST;
+    };
+    rpc UpdateGroupInfo (Groups_UpdateGroupInfoRequest) returns (Groups_UpdateGroupInfoResponse) {
+        option (rest.method) = POST;
+    };
+    rpc UpdateGroupPassword (Groups_UpdateGroupPasswordRequest) returns (Groups_UpdateGroupPasswordResponse) {
+        option (rest.method) = POST;
+    };
+}
+message Groups_CreateGroupConversationRequest {
+    string GroupName = 1;
+    string JoinPassword = 2;
+}
+message Groups_CreateGroupConversationResponse {
+    // TODO
+}
+message Groups_JoinGroupRequest {
+    string groupName = 1;
+    string joinPassword = 2;
+}
+message Groups_JoinGroupResponse {
+    // TODO
+}
+message Groups_TransferGroupOwnerRequest {
+    string groupName = 1;
+    string targetUserId = 2;
+}
+message Groups_TransferGroupOwnerResponse {
+    // TODO
+}
+message Groups_KickMemberRequest {
+    string groupName = 1;
+    string targetUserId = 2;
+}
+message Groups_KickMemberResponse {
+    // TODO
+}
+message Groups_DissolveGroupRequest {
+    string groupName = 1;
+}
+message Groups_DissolveGroupResponse {
+    // TODO
+}
+message Groups_LeaveGroupRequest {
+    string groupName = 1;
+}
+message Groups_LeaveGroupResponse {
+    // TODO
+}
+message Groups_SetGroupMutedRequest {
+    string groupName = 1;
+    bool setMuted = 2;
+}
+message Groups_SetGroupMutedResponse {
+    // TODO
+}
+message Groups_UpdateGroupInfoRequest {
+    string GroupName = 1;
+    string NewName = 2;
+    uint32 AvatarKey = 3;
+}
+message Groups_UpdateGroupInfoResponse {
+    // TODO
+}
+message Groups_UpdateGroupPasswordRequest {
+    string GroupName = 1;
+    string NewJoinPassword = 2;
+}
+message Groups_UpdateGroupPasswordResponse {
+    // TODO
+}

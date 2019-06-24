@@ -1,0 +1,57 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+import "google/protobuf/empty.proto";
+
+service Devices {
+    rpc AddDevice (Devices_AddDeviceRequest) returns (Devices_AddDeviceResponse) {
+        option (rest.method) = POST;
+    };
+    rpc UpdateDevice (Devices_UpdateDeviceRequest) returns (Devices_UpdateDeviceResponse) {
+        option (rest.method) = POST;
+    };
+    rpc MyDevices (google.protobuf.Empty) returns (Devices_MyDevicesResponse);
+    rpc PushTestMessage (google.protobuf.Empty) returns (Devices_PushTestMessageResponse) {
+        option (rest.method) = POST;
+    };
+}
+message Devices_AddDeviceRequest {
+    string Name = 1;
+    string PushEndpoint = 2;
+    string PushP256DH = 3;
+    string PushAuth = 4;
+}
+message Devices_AddDeviceResponse {
+    sint32 code = 1;
+    string message = 2;
+    // TODO
+}
+message Devices_UpdateDeviceRequest {
+    uint32 DeviceId = 1;
+    string Name = 2;
+    string PushEndpoint = 3;
+    string PushP256DH = 4;
+    string PushAuth = 5;
+}
+message Devices_UpdateDeviceResponse {
+    sint32 code = 1;
+    string message = 2;
+    // TODO
+}
+message Devices_MyDevicesResponse {
+    sint32 code = 1;
+    string message = 2;
+    repeated Item items = 3;
+    message Item {
+        uint32 id = 1;
+        string name = 2;
+        string ipAddress = 3;
+        string userId = 4;
+        string addTime = 5;
+    }
+}
+message Devices_PushTestMessageResponse {
+    sint32 code = 1;
+    string message = 2;
+}

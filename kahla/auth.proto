@@ -1,0 +1,143 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+import "google/protobuf/empty.proto";
+
+service Auth {
+    rpc Index (google.protobuf.Empty) returns (Auth_IndexResponse);
+    rpc Version (google.protobuf.Empty) returns (Auth_VersionResponse);
+    rpc AuthByPassword (Auth_AuthByPasswordRequest) returns (Auth_AuthByPasswordResponse) {
+        option (rest.method) = POST;
+    };
+    rpc RegisterKahla (Auth_RegisterKahlaRequest) returns (Auth_RegisterKahlaResponse) {
+        option (rest.method) = POST;
+    };
+    rpc OAuth (google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc AuthResult (Auth_AuthResultRequest) returns (google.protobuf.Empty);
+    rpc SignInStatus (google.protobuf.Empty) returns (Auth_SignInStatusResponse);
+    rpc Me (google.protobuf.Empty) returns (Auth_MeResponse);
+    rpc UpdateInfo (Auth_UpdateInfoRequest) returns (Auth_UpdateInfoResponse) {
+        option (rest.method) = POST;
+    };
+    rpc UpdateClientSetting (Auth_UpdateClientSettingRequest) returns (Auth_UpdateClientSettingResponse) {
+        option (rest.method) = POST;
+    };
+    rpc ChangePassword (Auth_ChangePasswordRequest) returns (Auth_ChangePasswordResponse) {
+        option (rest.method) = POST;
+    };
+    rpc SendEmail (Auth_SendEmailRequest) returns (Auth_SendEmailResponse) {
+        option (rest.method) = POST;
+    };
+    rpc InitPusher (google.protobuf.Empty) returns (Auth_InitPusherResponse);
+    rpc LogOff (Auth_LogOffRequest) returns (Auth_LogOffResponse);
+}
+message Auth_IndexResponse {
+    sint32 code = 1;
+    string message = 2;
+    string wikiPath = 3;
+    string serverTime = 4;
+    string utcTime = 5;
+}
+message Auth_VersionResponse {
+    sint32 code = 1;
+    string message = 2;
+    string latestVersion = 3;
+    string latestCLIVersion = 4;
+    string downloadAddress = 5;
+}
+message Auth_AuthByPasswordRequest {
+    string email = 1;
+    string password = 2;
+}
+message Auth_AuthByPasswordResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Auth_RegisterKahlaRequest {
+    string Email = 1;
+    string Password = 2;
+    string ConfirmPassword = 3;
+}
+message Auth_RegisterKahlaResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Auth_AuthResultRequest {
+    string state = 1;
+    uint32 code = 2;
+}
+message Auth_SignInStatusResponse {
+    sint32 code = 1;
+    string message = 2;
+    bool value = 3;
+}
+message Auth_MeResponse {
+    sint32 code = 1;
+    string message = 2;
+    Value value = 3;
+    message Value {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+message Auth_UpdateInfoRequest {
+    string NickName = 1;
+    string Bio = 2 [(rest.nullable) = true];
+    // TODO change to headImgFileKey
+    uint32 HeadImgKey = 3;
+    // TODO change to makeEmailPublic
+    bool HideMyEmail = 4;
+}
+message Auth_UpdateInfoResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Auth_UpdateClientSettingRequest {
+    uint32 ThemeId = 1 [(rest.nullable) = true];
+    bool EnableEmailNotification = 2 [(rest.nullable) = true];
+}
+message Auth_UpdateClientSettingResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Auth_ChangePasswordRequest {
+    string OldPassword = 1;
+    string NewPassword = 2;
+    string RepeatPassword = 3;
+}
+message Auth_ChangePasswordResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Auth_SendEmailRequest {
+    string email = 1;
+}
+message Auth_SendEmailResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Auth_InitPusherResponse {
+    sint32 code = 1;
+    string message = 2;
+    string serverPath = 3;
+    uint32 channelId = 4;
+    string connectKey = 5;
+}
+message Auth_LogOffRequest {
+    sint32 DeviceId = 1;
+}
+message Auth_LogOffResponse {
+    sint32 code = 1;
+    string message = 2;
+}

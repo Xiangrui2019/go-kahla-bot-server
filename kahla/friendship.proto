@@ -1,0 +1,211 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+import "google/protobuf/empty.proto";
+
+service Friendship {
+    rpc Mine (google.protobuf.Empty) returns (Friendship_MineResponse);
+    rpc DeleteFriend (Friendship_DeleteFriendRequest) returns (Friendship_DeleteFriendResponse) {
+        option (rest.method) = POST;
+    };
+    rpc CreateRequest (Friendship_CreateRequestRequest) returns (Friendship_CreateRequestResponse) {
+        option (rest.method) = POST;
+    };
+    rpc CompleteRequest (Friendship_CompleteRequestRequest) returns (Friendship_CompleteRequestResponse) {
+        option (rest.method) = POST;
+    };
+    rpc MyRequests (google.protobuf.Empty) returns (Friendship_MyRequestsResponse);
+    rpc SearchEverything (Friendship_SearchEverythingRequest) returns (Friendship_SearchEverythingResponse);
+    rpc DiscoverFriends (Friendship_DiscoverFriendsRequest) returns (Friendship_DiscoverFriendsResponse);
+    rpc UserDetail (Friendship_UserDetailRequest) returns (Friendship_UserDetailResponse);
+    rpc ReportHim (Friendship_ReportHimRequest) returns (Friendship_ReportHimResponse) {
+        option (rest.method) = POST;
+    };
+}
+message Friendship_MineResponse {
+    sint32 code = 1;
+    string message = 2;
+    repeated User users = 3;
+    repeated Group groups = 4;
+    message User {
+        bool makeEmailPublic = 1;
+        string email = 2;
+        string id = 3;
+        string bio = 4;
+        string nickName = 5;
+        string sex = 6;
+        uint32 headImgFileKey = 7;
+        string preferedLanguage = 8;
+        string accountCreateTime = 9;
+        bool emailConfirmed = 10;
+    }
+    message Group {
+        uint32 imageKey = 1;
+        string name = 2;
+        bool hasPassword = 3;
+        string ownerId = 4;
+        uint32 id = 5;
+        bool hasTimer = 6;
+        string conversationCreateTime = 7;
+    }
+}
+message Friendship_DeleteFriendRequest {
+    string id = 1;
+}
+message Friendship_DeleteFriendResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Friendship_CreateRequestRequest {
+    string id = 1;
+}
+message Friendship_CreateRequestResponse {
+    sint32 code = 1;
+    string message = 2;
+    uint32 value = 3;
+}
+message Friendship_CompleteRequestRequest {
+    string Id = 1;
+    bool Accept = 2;
+}
+message Friendship_CompleteRequestResponse {
+    sint32 code = 1;
+    string message = 2;
+}
+message Friendship_MyRequestsResponse {
+    sint32 code = 1;
+    string message = 2;
+    repeated Item items = 3;
+    message Item {
+        uint32 id = 1;
+        string creatorId = 2;
+        Creator creator = 3;
+        string targetId = 4;
+        string createTime = 5;
+        bool completed = 6;
+        message Creator {
+            bool makeEmailPublic = 1;
+            string email = 2;
+            string id = 3;
+            string bio = 4;
+            string nickName = 5;
+            string sex = 6;
+            uint32 headImgFileKey = 7;
+            string preferedLanguage = 8;
+            string accountCreateTime = 9;
+            bool emailConfirmed = 10;
+        }
+    }
+}
+message Friendship_SearchEverythingRequest {
+    string SearchInput = 1;
+    uint32 Take = 2;
+}
+message Friendship_SearchEverythingResponse {
+    sint32 code = 1;
+    string message = 2;
+    uint32 usersCount = 3;
+    uint32 groupsCount = 4;
+    repeated User users = 5;
+    repeated Group groups = 6;
+    message User {
+        bool makeEmailPublic = 1;
+        string email = 2;
+        string id = 3;
+        string bio = 4;
+        string nickName = 5;
+        string sex = 6;
+        uint32 headImgFileKey = 7;
+        string preferedLanguage = 8;
+        string accountCreateTime = 9;
+        bool emailConfirmed = 10;
+    }
+    message Group {
+        uint32 imageKey = 1;
+        string name = 2;
+        bool hasPassword = 3;
+        string ownerId = 4;
+        uint32 id = 5;
+        bool hasTimer = 6;
+        string conversationCreateTime = 7;
+    }
+}
+message Friendship_DiscoverFriendsRequest {
+    uint32 take = 1;
+}
+message Friendship_DiscoverFriendsResponse {
+    sint32 code = 1;
+    string message = 2;
+    repeated Item items = 3;
+    message Item {
+        uint32 commonFriends = 1;
+        uint32 commonGroups = 2;
+        bool sentRequest = 3;
+        TargetUser targetUser = 4;
+        message TargetUser {
+            bool makeEmailPublic = 1;
+            string email = 2;
+            string id = 3;
+            string bio = 4;
+            string nickName = 5;
+            string sex = 6;
+            uint32 headImgFileKey = 7;
+            string preferedLanguage = 8;
+            string accountCreateTime = 9;
+            bool emailConfirmed = 10;
+        }
+    }
+}
+message Friendship_UserDetailRequest {
+    string id = 1;
+}
+message Friendship_UserDetailResponse {
+    sint32 code = 1;
+    string message = 2;
+    User user = 3;
+    bool areFriends = 4;
+    bool sentRequest = 5;
+    PendingRequest pendingRequest = 6;
+    uint32 conversationId = 7;
+    message User {
+        bool makeEmailPublic = 1;
+        string email = 2;
+        string id = 3;
+        string bio = 4;
+        string nickName = 5;
+        string sex = 6;
+        uint32 headImgFileKey = 7;
+        string preferedLanguage = 8;
+        string accountCreateTime = 9;
+        bool emailConfirmed = 10;
+    }
+    message PendingRequest {
+        uint32 id = 1;
+        string creatorId = 2;
+        Creator creator = 3;
+        string targetId = 4;
+        string createTime = 5;
+        bool completed = 6;
+        message Creator {
+            bool makeEmailPublic = 1;
+            string email = 2;
+            string id = 3;
+            string bio = 4;
+            string nickName = 5;
+            string sex = 6;
+            uint32 headImgFileKey = 7;
+            string preferedLanguage = 8;
+            string accountCreateTime = 9;
+            bool emailConfirmed = 10;
+        }
+    }
+}
+message Friendship_ReportHimRequest {
+    string TargetUserId = 1;
+    string Reason = 2;
+}
+message Friendship_ReportHimResponse {
+    sint32 code = 1;
+    string message = 2;
+}

@@ -1,0 +1,165 @@
+syntax = "proto3";
+package pusher;
+
+enum Pusher_EventType {
+    NewMessage = 0;
+    NewFriendRequest = 1;
+    WereDeleted = 2;
+    FriendAccepted = 3;
+    TimerUpdated = 4;
+    NewMember = 5;
+    SomeoneLeft = 6;
+    Dissolve = 7;
+}
+
+message Pusher_Event {
+    uint32 type = 1;
+    string typeDescription = 2;
+}
+
+message Pusher_NewMessageEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    uint32 conversationId = 3;
+    Sender sender = 4;
+    string content = 5;
+    string aesKey = 6;
+    bool muted = 7;
+    bool mentioned = 8;
+
+    message Sender {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+
+message Pusher_NewFriendRequestEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    string requesterId = 3;
+    Requester requester = 4;
+
+    message Requester {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+
+message Pusher_WereDeletedEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    Trigger trigger = 3;
+
+    message Trigger {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+
+message Pusher_FriendAcceptedEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    Target target = 3;
+
+    message Target {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+
+message Pusher_TimerUpdatedEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    uint32 conversationId = 3;
+    uint32 newTimer = 4;
+}
+
+message Pusher_NewMemberEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    uint32 conversationId = 3;
+    NewMember newMember = 4;
+
+    message NewMember {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+
+message Pusher_SomeoneLeftEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    uint32 conversationId = 3;
+    LeftUser leftUser = 4;
+
+    message LeftUser {
+        string accountCreateTime = 1;
+        string bio = 2;
+        string email = 3;
+        bool emailConfirmed = 4;
+        bool enableEmailNotification = 5;
+        uint32 headImgFileKey = 6;
+        string id = 7;
+        bool makeEmailPublic = 8;
+        string nickName = 9;
+        string preferedLanguage = 10;
+        string sex = 11;
+        uint32 themeId = 12;
+    }
+}
+
+message Pusher_DissolveEvent {
+    uint32 type = 1;
+    string typeDescription = 2;
+    uint32 conversationId = 3;
+}

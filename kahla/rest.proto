@@ -1,0 +1,33 @@
+syntax = "proto3";
+package rest;
+
+import "google/protobuf/descriptor.proto";
+
+message RequestFile {
+}
+
+enum HttpMethod {
+    GET = 0;
+    POST = 1;
+}
+
+enum RequestContentType {
+    APPLICATION_X_WWW_FORM_URLENCODED = 0;
+    MULTIPART_FORM_DATA = 1;
+    APPLICATION_JSON = 2;
+}
+
+extend google.protobuf.FieldOptions {
+    HttpMethod field_method = 1000;
+    string name = 1001;
+    bool required = 1002;
+    bool request_param_nullable = 1003;
+}
+
+extend google.protobuf.MethodOptions {
+    string path = 1000;
+    HttpMethod method = 1001;
+    string url = 1002;
+    bool no_cookie = 1003;
+    RequestContentType request_content_type = 1004;
+}
