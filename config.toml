@@ -1,0 +1,16 @@
+# 地址配置
+HOST = "0.0.0.0"
+PORT = 8080
+
+# 环境设置
+# prod(发布) test(测试) dev(开发)
+ENV = "dev"
+
+# 机器人设置
+[bot]
+name = ""
+email = ""
+password = ""
+kahlaserver = ""
+callbackserver = ""
+messagecallbackendpoint = ""

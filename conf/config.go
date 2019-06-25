@@ -1,9 +1,27 @@
 package conf
 
-import "github.com/BurntSushi/toml"
+import (
+	"github.com/BurntSushi/toml"
+	"gopkg.in/macaron.v1"
+)
 
 type Config struct {
+	Host string `toml:"HOST"`
+	Port int `toml:"PORT"`
+	Env string `toml:"ENV"`
+}
 
+func (config *Config) ConfigEnvironment() error {
+	switch config.Env {
+	case "dev":
+		macaron.Env = macaron.DEV
+	case "test":
+		macaron.Env = macaron.TEST
+	case "prod":
+		macaron.Env = macaron.PROD
+	}
+
+	return nil
 }
 
 func LoadConfigFromFile(filePath string) (*Config, error) {
