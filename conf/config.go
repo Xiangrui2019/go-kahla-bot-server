@@ -9,6 +9,12 @@ type Config struct {
 	Host string `toml:"HOST"`
 	Port int `toml:"PORT"`
 	Env string `toml:"ENV"`
+	BotConfig Bot `toml:"bot"`
+}
+
+type Bot struct {
+	Name string `toml:"name"`
+
 }
 
 func (config *Config) ConfigEnvironment() error {
