@@ -30,6 +30,8 @@ func NewPusherServer() *PusherEventServer {
 
 	server.client = kahla.NewClient(server.config.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com")
 
+	server.pushereventing = pusher.NewPusher("", server.EventHandler)
+
 	return server
 }
 
@@ -71,7 +73,7 @@ func (server *PusherEventServer) runWebsocket(interrupt chan struct{}) error {
 		return err
 	}
 
-	server.pushereventing = pusher.NewPusher(*serverPath, server.EventHandler)
+	server.pushereventing.Url = *serverPath
 
 	err = server.pushereventing.Connect(interrupt)
 
