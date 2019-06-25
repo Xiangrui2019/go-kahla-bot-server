@@ -14,7 +14,11 @@ type Config struct {
 
 type Bot struct {
 	Name string `toml:"name"`
-
+	Email string `toml:"email"`
+	Password string `toml:"password"`
+	KahlaServer string `toml:"kahlaserver"`
+	CallbackServer string `toml:"callbackserver"`
+	MessageCallbackEndpoint string `toml:"messagecallbackendpoint"`
 }
 
 func (config *Config) ConfigEnvironment() error {
