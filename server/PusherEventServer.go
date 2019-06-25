@@ -60,6 +60,6 @@ func (server *PusherEventServer) EventHandler(i interface{}) {
 
 }
 
-func (server *PusherEventServer) Run() error {
-
+func (server *PusherEventServer) Run(interrupt chan struct{}) error {
+	return nil
 }
