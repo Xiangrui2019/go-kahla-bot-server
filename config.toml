@@ -8,9 +8,9 @@ ENV = "dev"
 
 # 机器人设置
 [bot]
-name = ""
-email = ""
-password = ""
-kahlaserver = ""
+name = "孔祥瑞"
+email = "xiangrui@aiursoft.com"
+password = "Xr111900"
+kahlaserver = "https://staging.server.kahla.app"
 callbackserver = ""
 messagecallbackendpoint = ""

@@ -14,6 +14,7 @@ import (
 type PusherEventServer struct {
 	client *kahla.Client
 	config *conf.Config
+	pushereventing *pusher.Pusher
 }
 
 func NewPusherServer() *PusherEventServer {
@@ -33,13 +34,16 @@ func NewPusherServer() *PusherEventServer {
 }
 
 func (server *PusherEventServer) login() error {
-	response, _, err := server.client.Auth.AuthByPassword(&kahla.Auth_AuthByPasswordRequest{})
+	response, _, err := server.client.Auth.AuthByPassword(&kahla.Auth_AuthByPasswordRequest{
+		Email: server.config.BotConfig.Email,
+		Password: server.config.BotConfig.Password,
+	})
 
 	if err != nil {
 		return err
 	}
 
-	if response.Code == enums.ResponseCodeOK {
+	if response.Code != enums.ResponseCodeOK {
 		return errors.New(response.Message)
 	}
 
@@ -53,11 +57,29 @@ func (server *PusherEventServer) initpusher() (*string, error) {
 		return nil, err
 	}
 
-	if response.Code == enums.ResponseCodeOK {
+	if response.Code != enums.ResponseCodeOK {
 		return nil, errors.New(response.Message)
 	}
 
 	return &response.ServerPath, nil
+}
+
+func (server *PusherEventServer) runWebsocket(interrupt chan struct{}) error {
+	serverPath, err := server.initpusher()
+
+	if err != nil {
+		return err
+	}
+
+	server.pushereventing = pusher.NewPusher(*serverPath, server.EventHandler)
+
+	err = server.pushereventing.Connect(interrupt)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (server *PusherEventServer) EventHandler(i interface{}) {
@@ -103,5 +125,17 @@ func (server *PusherEventServer) EventHandler(i interface{}) {
 }
 
 func (server *PusherEventServer) Run(interrupt chan struct{}) error {
+	err := server.login()
+
+	if err != nil {
+		return err
+	}
+
+	err = server.runWebsocket(interrupt)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
