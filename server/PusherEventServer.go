@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
-	"github.com/xiangrui2019/go-kahla-bot-server/cryptojs"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
+	"github.com/xiangrui2019/go-kahla-bot-server/server/handlers"
 	"log"
 )
 
@@ -87,14 +87,8 @@ func (server *PusherEventServer) runWebsocket(interrupt chan struct{}) error {
 func (server *PusherEventServer) EventHandler(i interface{}) {
 	switch v := i.(type) {
 	case *pusher.Pusher_NewMessageEvent:
-		content, err := cryptojs.AesDecrypt(v.Content, v.AesKey)
-		if err != nil {
-			log.Println(err)
-		} else {
-			title := v.Sender.NickName
-			message := content
-			log.Println(title, ":", message)
-		}
+		err := handlers.NewMessageHandler(v)
+		log.Println(err)
 	case *pusher.Pusher_NewFriendRequestEvent:
 		title := "Friend request"
 		message := "You have got a new friend request!"
