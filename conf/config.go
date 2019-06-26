@@ -10,6 +10,7 @@ type Config struct {
 	Port int `toml:"PORT"`
 	Env string `toml:"ENV"`
 	BotConfig Bot `toml:"bot"`
+	CorsOriginURL string `toml:"CORS_ORIGIN_URL"`
 }
 
 type Bot struct {

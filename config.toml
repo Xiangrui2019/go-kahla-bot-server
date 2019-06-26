@@ -6,6 +6,9 @@ PORT = 8080
 # prod(发布) test(测试) dev(开发)
 ENV = "dev"
 
+# CORS 设置
+CORS_ORIGIN_URL = "*"
+
 # 机器人设置
 [bot]
 name = "孔祥瑞"
