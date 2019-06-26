@@ -2,18 +2,21 @@ package server
 
 import (
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
+	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
 )
 
 type EventHandler struct {
 	config *conf.Config
+	client *kahla.Client
 }
 
-func NewEventHandler() *EventHandler {
+func NewEventHandler(cilen *kahla.Client) *EventHandler {
 	c, _ := conf.LoadConfigFromFile("./config.toml")
 
 	return &EventHandler{
 		config: c,
+		client: cilen,
 	}
 }
 
