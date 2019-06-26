@@ -7,6 +7,7 @@ import (
 func ConfigureMiddlewareRouting(context *macaron.Macaron) error {
 	context.Use(macaron.Logger())
 	context.Use(macaron.Recovery())
+	context.Use(macaron.Renderer())
 
 	return nil
 }
