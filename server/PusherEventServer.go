@@ -15,6 +15,7 @@ type PusherEventServer struct {
 	client *kahla.Client
 	config *conf.Config
 	pushereventing *pusher.Pusher
+	handler *EventHandler
 }
 
 func NewPusherServer() *PusherEventServer {
@@ -31,6 +32,8 @@ func NewPusherServer() *PusherEventServer {
 	server.client = kahla.NewClient(server.config.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com")
 
 	server.pushereventing = pusher.NewPusher("", server.EventHandler)
+
+	server.handler = NewEventHandler()
 
 	return server
 }
@@ -87,16 +90,20 @@ func (server *PusherEventServer) runWebsocket(interrupt chan struct{}) error {
 func (server *PusherEventServer) EventHandler(i interface{}) {
 	switch v := i.(type) {
 	case *pusher.Pusher_NewMessageEvent:
-		err := handlers.NewMessageHandler(v)
-		log.Println(err)
+		err := server.handler.NewMessageEvent(v)
+		if err != nil {
+			log.Println(err)
+		}
 	case *pusher.Pusher_NewFriendRequestEvent:
-		title := "Friend request"
-		message := "You have got a new friend request!"
-		log.Println(title, ":", message, "nick name:", v.Requester.NickName, "id:", v.Requester.Id)
+		err := server.handler.NewFriendRequestEvent(v)
+		if err != nil {
+			log.Println(err)
+		}
 	case *pusher.Pusher_WereDeletedEvent:
-		title := "Were deleted"
-		message := "You were deleted by one of your friends from his friend list."
-		log.Println(title, ":", message, "nick name:", v.Trigger.NickName, "id:", v.Trigger.Id)
+		err := server.handler.WereDeletedEvent(v)
+		if err != nil {
+			log.Println(err)
+		}
 	case *pusher.Pusher_FriendAcceptedEvent:
 		title := "Friend request"
 		message := "Your friend request was accepted!"
