@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	_ "github.com/xiangrui2019/go-kahla-bot-server/orm"
 )
 
 func main() {

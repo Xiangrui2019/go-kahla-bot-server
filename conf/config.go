@@ -11,6 +11,7 @@ type Config struct {
 	Env string `toml:"ENV"`
 	BotConfig Bot `toml:"bot"`
 	CorsOriginURL string `toml:"CORS_ORIGIN_URL"`
+	MySqlDSN string `toml:"MYSQL_DSN"`
 }
 
 type Bot struct {
