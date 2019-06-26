@@ -7,7 +7,6 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
-	"github.com/xiangrui2019/go-kahla-bot-server/server/handlers"
 	"log"
 )
 
