@@ -22,3 +22,7 @@ func (c *MainController) Index(context *macaron.Context)  {
 		Message: "Welcome to the kahla robot server.",
 	})
 }
+
+func (c *MainController) RedirectHome(context *macaron.Context) {
+	context.Redirect("https://github.com/xiangrui2019/go-kahla-bot-server")
+}

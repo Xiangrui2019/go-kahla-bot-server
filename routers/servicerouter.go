@@ -10,6 +10,7 @@ func ConfigureServiceRouting(context *macaron.Macaron) error {
 	maincontroller := controllers.NewMainController()
 
 	context.Any("/", maincontroller.Index)
+	context.Any("/home", maincontroller.RedirectHome)
 
 	return nil
 }
