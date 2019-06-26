@@ -10,9 +10,15 @@ type MainController struct {
 
 }
 
+func NewMainController() *MainController {
+	return &MainController{
+
+	}
+}
+
 func (c *MainController) Index(context *macaron.Context)  {
 	context.JSON(200, api.MainIndexModel{
 		Code: enums.ResponseCodeOK,
-		Message: "",
+		Message: "Welcome to the kahla robot server.",
 	})
 }
