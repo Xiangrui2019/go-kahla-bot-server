@@ -6,12 +6,10 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Unknwon/com v0.0.0-20190321035513-0fed4efef755 // indirect
 	github.com/ganlvtech/go-exportable-cookiejar v0.0.0-20181231191301-34af33d7487e
-	github.com/ganlvtech/go-kahla-api v0.0.0-20190623192354-1a57a2024931
 	github.com/go-macaron/inject v0.0.0-20160627170012-d8a0b8677191 // indirect
+	github.com/go-xorm/xorm v0.7.3
 	github.com/gorilla/websocket v1.4.0
-	github.com/malisit/kolpa v0.0.0-20171128201422-10c4658a62cb
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
-	github.com/stretchr/testify v1.3.0
 	gopkg.in/ini.v1 v1.42.0 // indirect
 	gopkg.in/macaron.v1 v1.3.2
 )
