@@ -16,6 +16,11 @@ func DeleteBotUser(id int64) error {
 	return err
 }
 
+func DeleteBotUserByKahlaId(id string) error {
+	_, err := orm.X.Delete(&models.BotUser{KahlaUserId: id})
+	return err
+}
+
 func GetBotUserById(id int64) (*models.BotUser, error) {
 	user := &models.BotUser{}
 
