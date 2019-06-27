@@ -2,19 +2,20 @@ package server
 
 import (
 	"errors"
-	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/models"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
+	"log"
 	"strconv"
 )
 
 type EventHandler struct {
 	config *conf.Config
 	client *kahla.Client
+	friendRequestChan chan struct{}
 }
 
 func NewEventHandler(cilen *kahla.Client) *EventHandler {
@@ -32,14 +33,32 @@ func (h *EventHandler) NewMessageEvent(v *pusher.Pusher_NewMessageEvent) error {
 }
 
 func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEvent) error {
-	err := h.acceptFriendRequest()
-	fmt.Println(err)
+	log.Println("有一个新的用户请求加入公众号..")
+	log.Printf("用户名: %s", v.Requester.NickName)
+	h.AcceptFriendRequest()
+	log.Println("已经同意此用户加入公众号.")
 	return nil
 }
 
 func (h *EventHandler) WereDeletedEvent(v *pusher.Pusher_WereDeletedEvent) error {
 
 	return nil
+}
+
+func (h *EventHandler) AcceptFriendRequest() {
+	select {
+	case h.friendRequestChan <- struct{}{}:
+		go func() {
+			err := h.acceptFriendRequest()
+
+			if err != nil {
+				log.Println(err)
+			}
+
+			<-h.friendRequestChan
+		}()
+	default:
+	}
 }
 
 func (h *EventHandler) acceptFriendRequest() error {
