@@ -60,6 +60,18 @@ func (h *EventHandler) WereDeletedEvent(v *pusher.Pusher_WereDeletedEvent) error
 
 func (h *EventHandler) RemoveBotUsers() error {
 	response, _, err := h.client.Friendship.Mine()
+
+	if err != nil {
+		return err
+	}
+
+
+
+	for _, v := range response.Users {
+
+	}
+
+	return nil
 }
 
 func (h *EventHandler) AcceptFriendRequest() error {
