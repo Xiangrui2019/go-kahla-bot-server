@@ -56,6 +56,6 @@ func GetBotUserByToken(token string) (*models.BotUser, error) {
 }
 
 func GetAllBotUser() (as []*models.BotUser, err error) {
-	err = orm.X.Find(new(models.BotUser), &as)
+	err = orm.X.Find(&as)
 	return as, err
 }

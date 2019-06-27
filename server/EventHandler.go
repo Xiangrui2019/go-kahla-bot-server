@@ -51,10 +51,8 @@ func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEv
 }
 
 func (h *EventHandler) WereDeletedEvent(v *pusher.Pusher_WereDeletedEvent) error {
-	err := dao.DeleteBotUserByKahlaId(v.Trigger.Id)
-	if err != nil {
-		return err
-	}
+	err := h.RemoveBotUsers()
+	log.Println(err)
 	return nil
 }
 
@@ -65,10 +63,24 @@ func (h *EventHandler) RemoveBotUsers() error {
 		return err
 	}
 
+	allusers, err := dao.GetAllBotUser()
 
+	if err != nil {
+		return err
+	}
 
-	for _, v := range response.Users {
+	for _, v := range allusers {
+		isinkahla := false
+		for _, user := range response.Users {
+			if v.KahlaUserId == user.Id {
+				isinkahla = true
+			}
+		}
 
+		if !isinkahla {
+			err := dao.DeleteBotUser(v.Id)
+			return err
+		}
 	}
 
 	return nil

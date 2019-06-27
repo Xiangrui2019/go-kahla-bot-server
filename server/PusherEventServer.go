@@ -21,6 +21,7 @@ func NewPusherServer() *PusherEventServer {
 	c, err := conf.LoadConfigFromFile("./config.toml")
 
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 
@@ -128,6 +129,13 @@ func (server *PusherEventServer) Run(interrupt chan struct{}) error {
 	err := server.login()
 
 	if err != nil {
+		return err
+	}
+
+	err = server.handler.RemoveBotUsers()
+
+	if err != nil {
+		log.Println(err)
 		return err
 	}
 
