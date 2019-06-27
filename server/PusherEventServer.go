@@ -18,21 +18,19 @@ type PusherEventServer struct {
 }
 
 func NewPusherServer() *PusherEventServer {
-	var err error
-
-	server := new(PusherEventServer)
-
-	server.config, err = conf.LoadConfigFromFile("./config.toml")
+	c, err := conf.LoadConfigFromFile("./config.toml")
 
 	if err != nil {
 		return nil
 	}
 
-	server.client = kahla.NewClient(server.config.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com")
+	server := &PusherEventServer{
+		config: c,
+		client: kahla.NewClient(c.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com"),
+	}
 
 	server.pushereventing = pusher.NewPusher("", server.EventHandler)
-
-	server.handler = NewEventHandler()
+	server.handler = NewEventHandler(server.client)
 
 	return server
 }
