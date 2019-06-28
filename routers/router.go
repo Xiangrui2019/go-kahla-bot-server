@@ -1,14 +1,19 @@
 package routers
 
-import "gopkg.in/macaron.v1"
+import (
+	"github.com/xiangrui2019/go-kahla-bot-server/injects"
+	"gopkg.in/macaron.v1"
+)
 
 type Router struct {
 	context *macaron.Macaron
+	inject *injects.BasicInject
 }
 
-func NewRouter(ctx *macaron.Macaron) *Router {
+func NewRouter(ctx *macaron.Macaron, injector *injects.BasicInject) *Router {
 	return &Router{
 		context: ctx,
+		inject: injector,
 	}
 }
 
@@ -19,7 +24,7 @@ func (r *Router) ConfigureRouting() error {
 		return err
 	}
 
-	err = ConfigureServiceRouting(r.context)
+	err = ConfigureServiceRouting(r.context, r.inject)
 
 	if err != nil {
 		return err

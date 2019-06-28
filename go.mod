@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Unknwon/com v0.0.0-20190321035513-0fed4efef755 // indirect
 	github.com/ganlvtech/go-exportable-cookiejar v0.0.0-20181231191301-34af33d7487e
+	github.com/go-macaron/binding v0.0.0-20170611065819-ac54ee249c27
 	github.com/go-macaron/inject v0.0.0-20160627170012-d8a0b8677191 // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-xorm/xorm v0.7.3

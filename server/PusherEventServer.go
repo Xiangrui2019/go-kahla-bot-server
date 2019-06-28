@@ -139,7 +139,12 @@ func (server *PusherEventServer) Run(interrupt chan struct{}) error {
 
 	if err != nil {
 		log.Println(err)
-		return err
+	}
+
+	err = server.handler.AcceptFriendRequest()
+
+	if err != nil {
+		log.Println(err)
 	}
 
 	err = server.runWebsocket(interrupt)

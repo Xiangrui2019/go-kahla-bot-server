@@ -35,7 +35,6 @@ func NewEventHandler(macaronapp *macaron.Macaron, injector *injects.BasicInject,
 }
 
 func (h *EventHandler) NewMessageEvent(v *pusher.Pusher_NewMessageEvent) error {
-
 	return nil
 }
 
@@ -185,6 +184,7 @@ CONTINUE:
 						Token: *token,
 						Nickname: v.Creator.NickName,
 						KahlaUserId: v.Creator.Id,
+						ConversationId: response.ConversationId,
 					})
 
 					if err != nil {

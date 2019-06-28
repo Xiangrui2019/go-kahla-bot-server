@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
@@ -16,7 +17,6 @@ import (
 
 func main() {
 	app := macaron.New()
-	router := routers.NewRouter(app)
 	injector := injects.NewInjector(app)
 
 	err := injector.Inject()
@@ -27,6 +27,7 @@ func main() {
 
 	config := app.GetVal(reflect.TypeOf(injector.Config)).Interface().(*conf.Config)
 	pusherserver := server.NewPusherServer(app, injector)
+	router := routers.NewRouter(app, injector)
 	interrupt := make(chan os.Signal, 1)
 	interrupt2 := make(chan struct{})
 
@@ -48,10 +49,14 @@ func main() {
 	}()
 
 	go func() {
-		err := pusherserver.Run(interrupt2)
+		err := errors.New("inital error to run")
 
-		if err != nil {
-			log.Fatal(err)
+		for err != nil  {
+			err = pusherserver.Run(interrupt2)
+
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}()
 

@@ -12,6 +12,8 @@ github.com/denisenkom/go-mssqldb v0.0.0-20190121005146-b04fd42d9952 h1:b5OnbZD49
 github.com/denisenkom/go-mssqldb v0.0.0-20190121005146-b04fd42d9952/go.mod h1:xN/JuLBIz4bjkxNmByTiV1IbhfnYb6oo99phBn4Eqhc=
 github.com/ganlvtech/go-exportable-cookiejar v0.0.0-20181231191301-34af33d7487e h1:zF8BCigEVAtW07yhpupU1FQ8DEzINaJ6HVfPUQY/uqY=
 github.com/ganlvtech/go-exportable-cookiejar v0.0.0-20181231191301-34af33d7487e/go.mod h1:EdkZC5tfJxfNZYtycwAG0adNOJRpGUyIhLcG6DvhyU0=
+github.com/go-macaron/binding v0.0.0-20170611065819-ac54ee249c27 h1:ieTTL9+RAtpcMaskwWNN19Vdrsl4X+k2CWsQijWNsAU=
+github.com/go-macaron/binding v0.0.0-20170611065819-ac54ee249c27/go.mod h1:u+H6rwW+HQwUL+w5uaEJSpIlVZDye1o9MB4Su0JfRfM=
 github.com/go-macaron/inject v0.0.0-20160627170012-d8a0b8677191 h1:NjHlg70DuOkcAMqgt0+XA+NHwtu66MkTVVgR4fFWbcI=
 github.com/go-macaron/inject v0.0.0-20160627170012-d8a0b8677191/go.mod h1:VFI2o2q9kYsC4o7VP1HrEVosiZZTd+MVT3YZx4gqvJw=
 github.com/go-sql-driver/mysql v1.4.1 h1:g24URVg0OFbNUTx9qqY1IRZ9D9z3iPyi5zKhQZpNwpA=

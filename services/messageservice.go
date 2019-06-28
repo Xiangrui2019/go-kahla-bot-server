@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"github.com/xiangrui2019/go-kahla-bot-server/cryptojs"
+	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 )
@@ -45,7 +46,37 @@ func (s *MessageService) SendMessageByConversationId(conversationId uint32, mess
 	return nil
 }
 
-func (s *MessageService) SendMessageByToken() error {
+func (s *MessageService) SendMessageByToken(token string, message string) error {
+	user, err := dao.GetBotUserByToken(token)
+
+	if err != nil {
+		return err
+	}
+
+	response, _, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+		Id: user.ConversationId,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return errors.New(response.Message)
+	}
+
+	content, err := cryptojs.AesEncrypt(message, response.Value.AesKey)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.SendRawMessage(user.ConversationId, content)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
