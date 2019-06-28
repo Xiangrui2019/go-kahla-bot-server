@@ -4,31 +4,28 @@ import (
 	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
+	_ "github.com/xiangrui2019/go-kahla-bot-server/orm"
 	"github.com/xiangrui2019/go-kahla-bot-server/routers"
 	"github.com/xiangrui2019/go-kahla-bot-server/server"
 	"gopkg.in/macaron.v1"
 	"log"
 	"net/http"
 	"os"
-	_ "github.com/xiangrui2019/go-kahla-bot-server/orm"
+	"reflect"
 )
 
 func main() {
 	app := macaron.New()
 	router := routers.NewRouter(app)
 	injector := injects.NewInjector(app)
-	config, err := conf.LoadConfigFromFile("./config.toml")
+
+	err := injector.Inject()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = injector.Inject()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	config := app.GetVal(reflect.TypeOf(injector.Config)).Interface().(*conf.Config)
 	pusherserver := server.NewPusherServer(app, injector)
 	interrupt := make(chan os.Signal, 1)
 	interrupt2 := make(chan struct{})

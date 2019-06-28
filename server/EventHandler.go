@@ -5,11 +5,14 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
+	"github.com/xiangrui2019/go-kahla-bot-server/injects"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/models"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
 	"github.com/xiangrui2019/go-kahla-bot-server/services"
+	"gopkg.in/macaron.v1"
 	"log"
+	"reflect"
 	"strconv"
 )
 
@@ -20,15 +23,13 @@ type EventHandler struct {
 	friendRequestChan chan struct{}
 }
 
-func NewEventHandler(cilen *kahla.Client) *EventHandler {
-	c, _ := conf.LoadConfigFromFile("./config.toml")
-
+func NewEventHandler(macaronapp *macaron.Macaron, injector *injects.BasicInject, cilen *kahla.Client) *EventHandler {
 	handler := &EventHandler{
-		config: c,
+		config: macaronapp.GetVal(reflect.TypeOf(injector.Config)).Interface().(*conf.Config),
 		client: cilen,
 	}
 
-	handler.tokenService = services.NewTokenService(handler.client)
+	handler.tokenService = services.NewTokenService(macaronapp, injector, handler.client)
 
 	return handler
 }

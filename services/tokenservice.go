@@ -3,8 +3,11 @@ package services
 import (
 	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
+	"github.com/xiangrui2019/go-kahla-bot-server/injects"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/functions"
+	"gopkg.in/macaron.v1"
+	"reflect"
 	"strings"
 )
 
@@ -13,12 +16,10 @@ type TokenService struct {
 	config *conf.Config
 }
 
-func NewTokenService(client *kahla.Client) *TokenService {
-	c, _ := conf.LoadConfigFromFile("./config.toml")
-
+func NewTokenService(macaronapp *macaron.Macaron, injector *injects.BasicInject, client *kahla.Client) *TokenService {
 	return &TokenService{
 		messageService: NewMessageService(client),
-		config: c,
+		config: macaronapp.GetVal(reflect.TypeOf(injector.Config)).Interface().(*conf.Config),
 	}
 }
 

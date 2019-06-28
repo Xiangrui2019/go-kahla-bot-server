@@ -16,6 +16,8 @@ MYSQL_DSN = "root:Xr111900@tcp(rm-wz9p9wn6719qplwioho.mysql.rds.aliyuncs.com:330
 # Max 48
 TOKEN_LENGTH = 6
 
+# 管理Token, 任何非安全请求，都需要使用此管理token进行访问，否则出错
+
 # 机器人设置
 [bot]
 name = "孔祥瑞"

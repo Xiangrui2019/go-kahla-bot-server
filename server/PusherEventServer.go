@@ -34,7 +34,7 @@ func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject)
 	}
 
 	server.pushereventing = pusher.NewPusher("", server.EventHandler)
-	server.handler = NewEventHandler(server.client)
+	server.handler = NewEventHandler(macaronapp, injector, server.client)
 
 	return server
 }
