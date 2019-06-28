@@ -36,6 +36,6 @@ func (c *MessageController) SendText(context *macaron.Context, model api.SendTex
 
 	context.JSON(200, map[string]string{
 		"code": "0",
-		"message": "OK.",
+		"message": "Successfully sent a message.",
 	})
 }
