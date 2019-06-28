@@ -18,6 +18,7 @@ func ConfigureServiceRouting(context *macaron.Macaron, injector *injects.BasicIn
 
 	context.Group("/message/", func() {
 		context.Post("/sendtext", binding.Bind(api.SendTextRequestModel{}), messagecontroller.SendText)
+		context.Post("/sendimage", binding.MultipartForm(api.SendImageRequestModel{}), messagecontroller.SendImage)
 	})
 
 	return nil

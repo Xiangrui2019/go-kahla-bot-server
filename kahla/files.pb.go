@@ -37,7 +37,8 @@ type Files_UploadMediaResponse struct {
 
 type Files_UploadFileRequest struct {
 	ConversationId uint32      `json:"ConversationId,omitempty"`
-	File           RequestFile `json:"File,omitempty"`
+	File           multipart.File `json:"File,omitempty"`
+	Name           string `json:"Name,omitempty"`
 }
 
 type Files_UploadFileResponse struct {
@@ -142,7 +143,7 @@ func (s *FilesService) UploadFile(in *Files_UploadFileRequest) (out *Files_Uploa
 		return nil, nil, err
 	}
 	file := in.File
-	writerFile, err := w.CreateFormFile("File", file.Name())
+	writerFile, err := w.CreateFormFile("File", in.Name)
 	if err != nil {
 		return nil, nil, err
 	}

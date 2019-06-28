@@ -13,6 +13,7 @@ import (
 
 type MessageController struct {
 	messageService *services.MessageService
+	client *kahla.Client
 }
 
 func NewMessageController(macaronapp *macaron.Macaron, injector *injects.BasicInject) *MessageController {
@@ -20,6 +21,7 @@ func NewMessageController(macaronapp *macaron.Macaron, injector *injects.BasicIn
 
 	return &MessageController{
 		messageService: services.NewMessageService(client),
+		client: client,
 	}
 }
 
@@ -38,4 +40,7 @@ func (c *MessageController) SendText(context *macaron.Context, model api.SendTex
 		"code": "0",
 		"message": "Successfully sent a message.",
 	})
+}
+
+func (c *MessageController) SendImage(context *macaron.Context, model api.SendImageRequestModel) {
 }
