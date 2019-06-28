@@ -9,9 +9,9 @@ import (
 )
 
 type BasicInject struct {
-	context *macaron.Macaron
-	logger *log.Logger
-	client *kahla.Client
+	Context *macaron.Macaron
+	Logger *log.Logger
+	Client *kahla.Client
 }
 
 func NewInjector(ctx *macaron.Macaron) *BasicInject {
@@ -19,14 +19,14 @@ func NewInjector(ctx *macaron.Macaron) *BasicInject {
 
 
 	return &BasicInject{
-		context: ctx,
-		logger: log.New(os.Stdout, "[kahla-bot] ", 0),
-		client: kahla.NewClient(c.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com"),
+		Context: ctx,
+		Logger: log.New(os.Stdout, "[kahla-bot] ", 0),
+		Client: kahla.NewClient(c.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com"),
 	}
 }
 
 func (inject *BasicInject) Inject() error {
-	inject.context.Map(inject.logger)
-	inject.context.Map(inject.client)
+	inject.Context.Map(inject.Logger)
+	inject.Context.Map(inject.Client)
 	return nil
 }

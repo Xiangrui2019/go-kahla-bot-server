@@ -12,6 +12,10 @@ CORS_ORIGIN_URL = "*"
 # MYSQL 数据库DSN
 MYSQL_DSN = "root:Xr111900@tcp(rm-wz9p9wn6719qplwioho.mysql.rds.aliyuncs.com:3306)/bot?charset=utf8"
 
+# Token 长度. 越长越不容易重复, 导致加入公众号时出现问题
+# Max 48
+TOKEN_LENGTH = 6
+
 # 机器人设置
 [bot]
 name = "孔祥瑞"

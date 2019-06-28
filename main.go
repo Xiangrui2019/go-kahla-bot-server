@@ -18,13 +18,20 @@ func main() {
 	router := routers.NewRouter(app)
 	injector := injects.NewInjector(app)
 	config, err := conf.LoadConfigFromFile("./config.toml")
-	pusherserver := server.NewPusherServer()
-	interrupt := make(chan os.Signal, 1)
-	interrupt2 := make(chan struct{})
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = injector.Inject()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pusherserver := server.NewPusherServer(app, injector)
+	interrupt := make(chan os.Signal, 1)
+	interrupt2 := make(chan struct{})
 
 	err = config.ConfigEnvironment()
 
@@ -33,12 +40,6 @@ func main() {
 	}
 
 	err = router.ConfigureRouting()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = injector.Inject()
 
 	if err != nil {
 		log.Fatal(err)

@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
+	"github.com/xiangrui2019/go-kahla-bot-server/injects"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
+	"gopkg.in/macaron.v1"
 	"log"
+	"reflect"
 )
 
 type PusherEventServer struct {
@@ -17,7 +20,7 @@ type PusherEventServer struct {
 	handler *EventHandler
 }
 
-func NewPusherServer() *PusherEventServer {
+func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject) *PusherEventServer {
 	c, err := conf.LoadConfigFromFile("./config.toml")
 
 	if err != nil {
@@ -27,7 +30,7 @@ func NewPusherServer() *PusherEventServer {
 
 	server := &PusherEventServer{
 		config: c,
-		client: kahla.NewClient(c.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com"),
+		client: macaronapp.GetVal(reflect.TypeOf(injector.Client)).Interface().(*kahla.Client),
 	}
 
 	server.pushereventing = pusher.NewPusher("", server.EventHandler)
@@ -132,7 +135,7 @@ func (server *PusherEventServer) Run(interrupt chan struct{}) error {
 		return err
 	}
 
-	err = server.handler.RemoveBotUsers()
+	err = server.handler.UpdateConversation()
 
 	if err != nil {
 		log.Println(err)

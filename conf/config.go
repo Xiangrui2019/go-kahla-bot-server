@@ -12,6 +12,7 @@ type Config struct {
 	BotConfig Bot `toml:"bot"`
 	CorsOriginURL string `toml:"CORS_ORIGIN_URL"`
 	MySqlDSN string `toml:"MYSQL_DSN"`
+	TokenLength int `toml:"TOKEN_LENGTH"`
 }
 
 type Bot struct {

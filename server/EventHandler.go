@@ -41,7 +41,14 @@ func (h *EventHandler) NewMessageEvent(v *pusher.Pusher_NewMessageEvent) error {
 func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEvent) error {
 	log.Println("有一个新的用户请求加入公众号..")
 	log.Printf("用户名: %s", v.Requester.NickName)
-	err := h.AcceptFriendRequest()
+	log.Println("首先需要清理数据库...")
+	err := h.UpdateConversation()
+	log.Println("数据库清理成功...")
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	err = h.AcceptFriendRequest()
 	if err != nil {
 		log.Println(err)
 		return err
@@ -51,12 +58,18 @@ func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEv
 }
 
 func (h *EventHandler) WereDeletedEvent(v *pusher.Pusher_WereDeletedEvent) error {
-	err := h.RemoveBotUsers()
-	log.Println(err)
+	log.Printf("有人从我们的公众号退出了: %s", v.Trigger.NickName)
+	log.Printf("详细信息: ID: %s", v.Trigger.Id)
+	err := h.UpdateConversation()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println("退出事件处理完成.")
 	return nil
 }
 
-func (h *EventHandler) RemoveBotUsers() error {
+func (h *EventHandler) UpdateConversation() error {
 	response, _, err := h.client.Friendship.Mine()
 
 	if err != nil {
@@ -78,6 +91,7 @@ func (h *EventHandler) RemoveBotUsers() error {
 		}
 
 		if !isinkahla {
+			log.Println("删除了当前不存在的好友信息")
 			err := dao.DeleteBotUser(v.Id)
 			return err
 		}
@@ -105,6 +119,7 @@ CONTINUE:
 				Id: strconv.Itoa(int(v.Id)),
 				Accept: true,
 			})
+			log.Printf("同意了一个好友请求: %d", v.Id)
 
 			if err != nil {
 				if err1 == nil {
@@ -151,7 +166,7 @@ CONTINUE:
 
 					if response.AreFriends != true {
 						if err1 == nil {
-							err1 = errors.New("Your are not friends")
+							err1 = errors.New("your are not friends")
 						}
 						continue CONTINUE
 					}
@@ -175,12 +190,21 @@ CONTINUE:
 						if err1 == nil {
 							err1 = err
 						}
-						continue
+						continue CONTINUE
+					}
+
+					err = h.UpdateConversation()
+
+					if err != nil {
+						if err1 == nil {
+							err1 = err
+						}
+						continue CONTINUE
 					}
 				}
 			}
 		}
 	}
 
-	return nil
+	return err1
 }
