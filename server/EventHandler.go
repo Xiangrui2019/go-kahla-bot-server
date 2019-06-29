@@ -12,6 +12,7 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/services"
 	"gopkg.in/macaron.v1"
 	"log"
+	"net/http"
 	"reflect"
 	"strconv"
 )
@@ -70,10 +71,18 @@ func (h *EventHandler) WereDeletedEvent(v *pusher.Pusher_WereDeletedEvent) error
 }
 
 func (h *EventHandler) UpdateConversation() error {
-	response, _, err := h.client.Friendship.Mine()
+	response, httpResponse, err := h.client.Friendship.Mine()
 
 	if err != nil {
 		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return errors.New(response.Message)
 	}
 
 	allusers, err := dao.GetAllBotUser()
@@ -103,10 +112,14 @@ func (h *EventHandler) UpdateConversation() error {
 func (h *EventHandler) AcceptFriendRequest() error {
 	var err1 error
 
-	response, _, err := h.client.Friendship.MyRequests()
+	response, httpResponse, err := h.client.Friendship.MyRequests()
 
 	if err != nil {
 		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
 	}
 
 	if response.Code != enums.ResponseCodeOK {
@@ -128,6 +141,13 @@ CONTINUE:
 				continue
 			}
 
+			if httpResponse.StatusCode != http.StatusOK {
+				if err1 == nil {
+					err1 = errors.New("status code not 200")
+				}
+				continue
+			}
+
 			if response.Code != enums.ResponseCodeOK {
 				if err1 == nil {
 					err1 = errors.New(response.Message)
@@ -135,7 +155,7 @@ CONTINUE:
 				continue
 			}
 
-			mines, _, err := h.client.Friendship.Mine()
+			mines, httpResponse, err := h.client.Friendship.Mine()
 
 			if err != nil {
 				if err1 == nil {
@@ -144,9 +164,23 @@ CONTINUE:
 				continue
 			}
 
+			if httpResponse.StatusCode != http.StatusOK {
+				if err1 == nil {
+					err1 = errors.New("status code not 200")
+				}
+				continue
+			}
+
+			if mines.Code != enums.ResponseCodeOK {
+				if err1 == nil {
+					err1 = errors.New(mines.Message)
+				}
+				continue
+			}
+
 			for _, user := range mines.Users {
 				if user.Id == v.CreatorId {
-					response, _, err := h.client.Friendship.UserDetail(&kahla.Friendship_UserDetailRequest{
+					response, httpResponse, err := h.client.Friendship.UserDetail(&kahla.Friendship_UserDetailRequest{
 						Id: user.Id,
 					})
 
@@ -155,6 +189,13 @@ CONTINUE:
 							err1 = err
 						}
 						continue CONTINUE
+					}
+
+					if httpResponse.StatusCode != http.StatusOK {
+						if err1 == nil {
+							err1 = errors.New("status code not 200")
+						}
+						continue
 					}
 
 					if response.Code != enums.ResponseCodeOK {
