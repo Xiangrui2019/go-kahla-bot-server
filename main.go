@@ -60,14 +60,14 @@ func main() {
 		}
 	}()
 
-	httpserver := http.Server{
+	server := http.Server{
 		Addr: fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Handler: app,
 	}
 
 	log.Printf("listening on %s (%s)\n", fmt.Sprintf("%s:%d", config.Host, config.Port), macaron.Env)
 
-	err = httpserver.ListenAndServe()
+	err = server.ListenAndServe()
 
 	if err != nil {
 		log.Fatal(err)
