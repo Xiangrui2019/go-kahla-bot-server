@@ -10,6 +10,7 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
 	"gopkg.in/macaron.v1"
 	"log"
+	"net/http"
 	"reflect"
 )
 
@@ -40,13 +41,17 @@ func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject)
 }
 
 func (server *PusherEventServer) login() error {
-	response, _, err := server.client.Auth.AuthByPassword(&kahla.Auth_AuthByPasswordRequest{
+	response, httpResponse, err := server.client.Auth.AuthByPassword(&kahla.Auth_AuthByPasswordRequest{
 		Email: server.config.BotConfig.Email,
 		Password: server.config.BotConfig.Password,
 	})
 
 	if err != nil {
 		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
 	}
 
 	if response.Code != enums.ResponseCodeOK {
@@ -57,10 +62,14 @@ func (server *PusherEventServer) login() error {
 }
 
 func (server *PusherEventServer) initpusher() (*string, error) {
-	response, _, err := server.client.Auth.InitPusher()
+	response, httpResponse, err := server.client.Auth.InitPusher()
 
 	if err != nil {
 		return nil, err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
 	}
 
 	if response.Code != enums.ResponseCodeOK {
