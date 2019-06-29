@@ -6,6 +6,7 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
+	"net/http"
 )
 
 type MessageService struct {
@@ -19,12 +20,16 @@ func NewMessageService(clien *kahla.Client) *MessageService {
 }
 
 func (s *MessageService) SendMessageByConversationId(conversationId uint32, message string) error {
-	response, _, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+	response, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
 		Id: conversationId,
 	})
 
 	if err != nil {
 		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
 	}
 
 	if response.Code != enums.ResponseCodeOK {
@@ -53,12 +58,16 @@ func (s *MessageService) SendMessageByToken(token string, message string) error 
 		return err
 	}
 
-	response, _, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+	response, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
 		Id: user.ConversationId,
 	})
 
 	if err != nil {
 		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
 	}
 
 	if response.Code != enums.ResponseCodeOK {
@@ -81,13 +90,17 @@ func (s *MessageService) SendMessageByToken(token string, message string) error 
 }
 
 func (s *MessageService) SendRawMessage(conversationId uint32, message string) error {
-	response, _, err := s.client.Conversation.SendMessage(&kahla.Conversation_SendMessageRequest{
+	response, httpResponse, err := s.client.Conversation.SendMessage(&kahla.Conversation_SendMessageRequest{
 		Id:      conversationId,
 		Content: message,
 	})
 
 	if err != nil {
 		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
 	}
 
 	if response.Code != enums.ResponseCodeOK {
