@@ -23,7 +23,7 @@ type Pusher struct {
 	EventHandlers []EventHandler
 }
 
-func NewPusher(url string, eventHandlers ...EventHandler) *Pusher {
+func New(url string, eventHandlers ...EventHandler) *Pusher {
 	return &Pusher{
 		Url:           url,
 		EventHandlers: eventHandlers,

@@ -34,7 +34,7 @@ func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject)
 		client: macaronapp.GetVal(reflect.TypeOf(injector.Client)).Interface().(*kahla.Client),
 	}
 
-	server.pushereventing = pusher.NewPusher("", server.EventHandler)
+	server.pushereventing = pusher.New("", server.EventHandler)
 	server.handler = NewEventHandler(macaronapp, injector, server.client)
 
 	return server
