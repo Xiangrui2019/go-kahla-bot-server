@@ -18,15 +18,15 @@ const (
 type EventHandler func(interface{})
 
 type Pusher struct {
-	conn        *websocket.Conn
-	Url         string
-	HandleEvent EventHandler
+	conn          *websocket.Conn
+	Url           string
+	EventHandlers []EventHandler
 }
 
-func NewPusher(url string, handleEvent EventHandler) *Pusher {
+func NewPusher(url string, eventHandlers ...EventHandler) *Pusher {
 	return &Pusher{
-		Url:         url,
-		HandleEvent: handleEvent,
+		Url:           url,
+		EventHandlers: eventHandlers,
 	}
 }
 
@@ -65,7 +65,9 @@ func (p *Pusher) Connect(interrupt <-chan struct{}) error {
 				errChan <- err
 				return
 			}
-			p.HandleEvent(event)
+			for _, eventHandler := range p.EventHandlers {
+				eventHandler(event)
+			}
 		}
 	}()
 

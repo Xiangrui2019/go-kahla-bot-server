@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/api"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
@@ -43,4 +44,11 @@ func (c *MessageController) SendText(context *macaron.Context, model api.SendTex
 }
 
 func (c *MessageController) SendImage(context *macaron.Context, model api.SendImageRequestModel) {
+	file, _ := model.Image.Open()
+	response, _, _ := c.client.Files.UploadMedia(&kahla.Files_UploadMediaRequest{
+		File: file,
+		Name: model.Image.Filename,
+	})
+
+	fmt.Printf("%+v", *response)
 }

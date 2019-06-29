@@ -14,7 +14,8 @@ import (
 )
 
 type Files_UploadIconRequest struct {
-	File RequestFile `json:"File,omitempty"`
+	File multipart.File `json:"File,omitempty"`
+	Name string `json:"Name,omitempty"`
 }
 
 type Files_UploadIconResponse struct {
@@ -25,7 +26,8 @@ type Files_UploadIconResponse struct {
 }
 
 type Files_UploadMediaRequest struct {
-	File RequestFile `json:"File,omitempty"`
+	File multipart.File `json:"File,omitempty"`
+	Name string `json:"Name,omitempty"`
 }
 
 type Files_UploadMediaResponse struct {
@@ -76,7 +78,7 @@ func (s *FilesService) UploadIcon(in *Files_UploadIconRequest) (out *Files_Uploa
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 	file := in.File
-	writerFile, err := w.CreateFormFile("File", file.Name())
+	writerFile, err := w.CreateFormFile("File", in.Name)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -107,7 +109,7 @@ func (s *FilesService) UploadMedia(in *Files_UploadMediaRequest) (out *Files_Upl
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 	file := in.File
-	writerFile, err := w.CreateFormFile("File", file.Name())
+	writerFile, err := w.CreateFormFile("File", in.Name)
 	if err != nil {
 		return nil, nil, err
 	}
