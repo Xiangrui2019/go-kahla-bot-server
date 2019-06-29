@@ -1,0 +1,10 @@
+syntax = "proto3";
+package kahla;
+
+import "rest.proto";
+
+message Oss_Download_FromKeyRequest {
+    uint32 headImgFileKey = 1;
+    uint32 w = 2 [(rest.field_nullable) = true];
+    uint32 h = 3 [(rest.field_nullable) = true];
+}

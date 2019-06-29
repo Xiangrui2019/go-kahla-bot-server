@@ -1,6 +1,7 @@
 package kahla
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,11 +17,15 @@ func NewOssService(client *http.Client, baseUrl string) *OssService {
 	return &OssService{client: client, baseUrl: baseUrl}
 }
 
-func (s *OssService) HeadImgFile(headImgFileKey uint32, w int, h int) ([]byte, *http.Response, error) {
+func (s *OssService) HeadImgFile(in *Oss_Download_FromKeyRequest) ([]byte, *http.Response, error) {
 	v := url.Values{}
-	v.Set("w", strconv.Itoa(w))
-	v.Set("h", strconv.Itoa(h))
-	resp, err := s.client.Get("https://oss.aiursoft.com/Download/FromKey/%d" + strconv.FormatUint(uint64(headImgFileKey), 10) + "?" + v.Encode())
+	if in.W != nil {
+		v.Add("w", strconv.FormatUint(uint64(*in.W), 10))
+	}
+	if in.H != nil {
+		v.Add("h", strconv.FormatUint(uint64(*in.H), 10))
+	}
+	resp, err := s.client.Get(s.baseUrl + fmt.Sprintf("/Download/FromKey/%d", in.HeadImgFileKey) + "?" + v.Encode())
 	if err != nil {
 		return nil, resp, err
 	}
