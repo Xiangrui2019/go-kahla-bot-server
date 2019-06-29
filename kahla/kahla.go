@@ -3,7 +3,7 @@ package kahla
 import (
 	"net/http"
 
-	cookiejar "github.com/ganlvtech/go-exportable-cookiejar"
+	"net/http/cookiejar"
 )
 
 type Client struct {
@@ -30,6 +30,6 @@ func NewClient(baseUrl string, ossUrl string) *Client {
 		Files:        NewFilesService(client, baseUrl),
 		Friendship:   NewFriendshipService(client, baseUrl),
 		Groups:       NewGroupsService(client, baseUrl),
-		Oss:          NewOssService(client, baseUrl),
+		Oss:          NewOssService(client, ossUrl),
 	}
 }
