@@ -136,6 +136,70 @@ func (s *MessageService) SendImageMessageByConversationId(conversationId uint32,
 	return nil
 }
 
+func (s *MessageService) SendVoiceMessageByToken(token string, fileheader *multipart.FileHeader) error {
+	user, err := dao.GetBotUserByToken(token)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.SendVoiceMessageByConversationId(user.ConversationId, fileheader)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *MessageService) SendVoiceMessageByConversationId(conversationId uint32, fileheader *multipart.FileHeader) error {
+	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+		Id: conversationId,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
+	}
+
+	if conversation.Code != enums.ResponseCodeOK {
+		return errors.New(conversation.Message)
+	}
+
+	voicefile, err := fileheader.Open()
+
+	if err != nil {
+		return err
+	}
+
+	mediaresponse, httpResponse, _ := s.client.Files.UploadFile(&kahla.Files_UploadFileRequest{
+		File: voicefile,
+		Name: fileheader.Filename,
+		ConversationId: conversationId,
+	})
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
+	}
+
+	if mediaresponse.Code != enums.ResponseCodeOK {
+		return errors.New(conversation.Message)
+	}
+
+	message := fmt.Sprintf("[audio]%d", mediaresponse.FileKey)
+
+	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *MessageService) SendRawMessage(conversationId uint32, message string, AesKey string) error {
 	content, err := cryptojs.AesEncrypt(message, AesKey)
 

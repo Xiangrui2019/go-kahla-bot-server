@@ -7,4 +7,5 @@ const (
 	ResponseCodeInvalidAccessToken
 	ResponseCodeSendMessageFailed
 	ImageError
+	VoiceError
 )

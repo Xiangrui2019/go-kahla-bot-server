@@ -57,3 +57,28 @@ func (c *MessageController) SendImage(context *macaron.Context, model api.SendIm
 		Message: "Successfully sent a message.",
 	})
 }
+
+func (c *MessageController) SendVideo(context *macaron.Context) {
+
+}
+
+func (c *MessageController) SendFile(context *macaron.Context) {
+
+}
+
+func (c *MessageController) SendVoice(context *macaron.Context, model api.SendVoiceRequestModel) {
+	err := c.messageService.SendVoiceMessageByToken(model.Token, model.Voice)
+
+	if err != nil {
+		context.JSON(500, api.SendImageResponseModel{
+			Code: enums.VoiceError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	context.JSON(200, api.SendImageResponseModel{
+		Code: enums.ResponseCodeOK,
+		Message: "Successfully sent a message.",
+	})
+}
