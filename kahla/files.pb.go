@@ -33,7 +33,7 @@ type Files_UploadMediaRequest struct {
 type Files_UploadMediaResponse struct {
 	Code         int32  `json:"code,omitempty"`
 	Message      string `json:"message,omitempty"`
-	FileKey      string `json:"fileKey,omitempty"`
+	FileKey      string `json:"FileKey,omitempty"`
 	DownloadPath string `json:"downloadPath,omitempty"`
 }
 

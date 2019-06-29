@@ -8,7 +8,7 @@ import (
 	"gopkg.in/macaron.v1"
 )
 
-
+// 配置控制器路由
 func ConfigureServiceRouting(context *macaron.Macaron, injector *injects.BasicInject) error {
 	maincontroller := controllers.NewMainController()
 	messagecontroller := controllers.NewMessageController(context, injector)
@@ -18,7 +18,7 @@ func ConfigureServiceRouting(context *macaron.Macaron, injector *injects.BasicIn
 
 	context.Group("/message/", func() {
 		context.Post("/sendtext", binding.Bind(api.SendTextRequestModel{}), messagecontroller.SendText)
-		context.Post("/sendimage", binding.MultipartForm(api.SendImageRequestModel{}), messagecontroller.SendImage)
+		context.Post("/sendimage", binding.Bind(api.SendImageRequestModel{}), messagecontroller.SendImage)
 	})
 
 	return nil

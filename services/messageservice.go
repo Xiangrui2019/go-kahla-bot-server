@@ -2,11 +2,15 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/cryptojs"
 	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
+	"github.com/xiangrui2019/go-kahla-bot-server/functions"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
+	"mime/multipart"
 	"net/http"
+	"strconv"
 )
 
 type MessageService struct {
@@ -20,7 +24,7 @@ func NewMessageService(clien *kahla.Client) *MessageService {
 }
 
 func (s *MessageService) SendMessageByConversationId(conversationId uint32, message string) error {
-	response, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
 		Id: conversationId,
 	})
 
@@ -32,17 +36,11 @@ func (s *MessageService) SendMessageByConversationId(conversationId uint32, mess
 		return errors.New("status code not 200")
 	}
 
-	if response.Code != enums.ResponseCodeOK {
-		return errors.New(response.Message)
+	if conversation.Code != enums.ResponseCodeOK {
+		return errors.New(conversation.Message)
 	}
 
-	content, err := cryptojs.AesEncrypt(message, response.Value.AesKey)
-
-	if err != nil {
-		return err
-	}
-
-	err = s.SendRawMessage(conversationId, content)
+	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
 
 	if err != nil {
 		return err
@@ -58,8 +56,34 @@ func (s *MessageService) SendMessageByToken(token string, message string) error 
 		return err
 	}
 
-	response, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
-		Id: user.ConversationId,
+	err = s.SendMessageByConversationId(user.ConversationId, message)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *MessageService) SendImageMessageByToken(token string, fileheader *multipart.FileHeader) error {
+	user, err := dao.GetBotUserByToken(token)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.SendImageMessageByConversationId(user.ConversationId, fileheader)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *MessageService) SendImageMessageByConversationId(conversationId uint32, fileheader *multipart.FileHeader) error {
+	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+		Id: conversationId,
 	})
 
 	if err != nil {
@@ -70,17 +94,40 @@ func (s *MessageService) SendMessageByToken(token string, message string) error 
 		return errors.New("status code not 200")
 	}
 
-	if response.Code != enums.ResponseCodeOK {
-		return errors.New(response.Message)
+	if conversation.Code != enums.ResponseCodeOK {
+		return errors.New(conversation.Message)
 	}
 
-	content, err := cryptojs.AesEncrypt(message, response.Value.AesKey)
+	width, height, err := functions.GetImageSize(fileheader)
 
 	if err != nil {
 		return err
 	}
 
-	err = s.SendRawMessage(user.ConversationId, content)
+	imagefile, err := fileheader.Open()
+
+	if err != nil {
+		return err
+	}
+
+	mediaresponse, httpResponse, _ := s.client.Files.UploadMedia(&kahla.Files_UploadMediaRequest{
+		File: imagefile,
+		Name: fileheader.Filename,
+	})
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
+	}
+
+	if mediaresponse.Code != enums.ResponseCodeOK {
+		return errors.New(conversation.Message)
+	}
+
+	fileKey := functions.ParseFileKey(mediaresponse.DownloadPath)
+
+	message := fmt.Sprintf("[img]%s-%s-%s-0", fileKey, strconv.Itoa(width), strconv.Itoa(height))
+
+	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
 
 	if err != nil {
 		return err
@@ -89,10 +136,16 @@ func (s *MessageService) SendMessageByToken(token string, message string) error 
 	return nil
 }
 
-func (s *MessageService) SendRawMessage(conversationId uint32, message string) error {
+func (s *MessageService) SendRawMessage(conversationId uint32, message string, AesKey string) error {
+	content, err := cryptojs.AesEncrypt(message, AesKey)
+
+	if err != nil {
+		return err
+	}
+
 	response, httpResponse, err := s.client.Conversation.SendMessage(&kahla.Conversation_SendMessageRequest{
 		Id:      conversationId,
-		Content: message,
+		Content: content,
 	})
 
 	if err != nil {

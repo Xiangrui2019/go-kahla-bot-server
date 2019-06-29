@@ -6,4 +6,5 @@ const (
 	ResponseCodeNoContent
 	ResponseCodeInvalidAccessToken
 	ResponseCodeSendMessageFailed
+	ImageError
 )

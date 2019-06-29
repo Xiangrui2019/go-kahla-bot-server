@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/xiangrui2019/go-kahla-bot-server/api"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
@@ -9,7 +8,6 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/services"
 	"gopkg.in/macaron.v1"
 	"reflect"
-	"strconv"
 )
 
 type MessageController struct {
@@ -30,25 +28,32 @@ func (c *MessageController) SendText(context *macaron.Context, model api.SendTex
 	err := c.messageService.SendMessageByToken(model.Token, model.Content)
 
 	if err != nil {
-		context.JSON(500, map[string]string{
-			"code": strconv.Itoa(enums.ResponseCodeSendMessageFailed),
-			"message": err.Error(),
+		context.JSON(500, api.SendTextResponseModel{
+			Code: enums.ResponseCodeSendMessageFailed,
+			Message: err.Error(),
 		})
 		return
 	}
 
-	context.JSON(200, map[string]string{
-		"code": "0",
-		"message": "Successfully sent a message.",
+	context.JSON(200, api.SendTextResponseModel{
+		Code: enums.ResponseCodeOK,
+		Message: "Successfully sent a message.",
 	})
 }
 
 func (c *MessageController) SendImage(context *macaron.Context, model api.SendImageRequestModel) {
-	file, _ := model.Image.Open()
-	response, _, _ := c.client.Files.UploadMedia(&kahla.Files_UploadMediaRequest{
-		File: file,
-		Name: model.Image.Filename,
-	})
+	err := c.messageService.SendImageMessageByToken(model.Token, model.Image)
 
-	fmt.Printf("%+v", *response)
+	if err != nil {
+		context.JSON(500, api.SendImageResponseModel{
+			Code: enums.ImageError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	context.JSON(200, api.SendImageResponseModel{
+		Code: enums.ResponseCodeOK,
+		Message: "Successfully sent a message.",
+	})
 }

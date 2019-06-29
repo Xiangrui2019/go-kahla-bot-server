@@ -18,7 +18,6 @@ type BasicInject struct {
 func NewInjector(ctx *macaron.Macaron) *BasicInject {
 	c, _ := conf.LoadConfigFromFile("./config.toml")
 
-
 	return &BasicInject{
 		Context: ctx,
 		Logger: log.New(os.Stdout, "[kahla-bot] ", 0),
@@ -27,6 +26,7 @@ func NewInjector(ctx *macaron.Macaron) *BasicInject {
 	}
 }
 
+// 注册所有需要注入的对象
 func (inject *BasicInject) Inject() error {
 	inject.Context.Map(inject.Logger)
 	inject.Context.Map(inject.Client)

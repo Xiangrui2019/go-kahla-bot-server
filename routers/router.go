@@ -17,6 +17,7 @@ func NewRouter(ctx *macaron.Macaron, injector *injects.BasicInject) *Router {
 	}
 }
 
+// 配置全部路由
 func (r *Router) ConfigureRouting() error {
 	err := ConfigureMiddlewareRouting(r.context)
 

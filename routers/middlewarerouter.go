@@ -8,6 +8,7 @@ import (
 
 var config *conf.Config
 
+// 配置中间件路由
 func ConfigureMiddlewareRouting(context *macaron.Macaron) error {
 	var err error
 	config, err = conf.LoadConfigFromFile("./config.toml")
