@@ -21,12 +21,24 @@ type Pusher struct {
 	conn          *websocket.Conn
 	Url           string
 	EventHandlers []EventHandler
+	State           int
+	StateChangeChan chan int
 }
 
 func New(url string, eventHandlers ...EventHandler) *Pusher {
 	return &Pusher{
 		Url:           url,
 		EventHandlers: eventHandlers,
+		State: WebSocketStateNew,
+		StateChangeChan: make(chan int),
+	}
+}
+
+func (p *Pusher) changeState(state int) {
+	p.State = state
+	select {
+	case p.StateChangeChan <- state:
+	default:
 	}
 }
 
@@ -82,6 +94,7 @@ func (p *Pusher) Connect(interrupt <-chan struct{}) error {
 			select {
 			case err := <-errChan:
 				// Message loop exit with error
+				p.changeState(WebSocketStateDisconnected)
 				return err
 			default:
 				panic("cannot reach")
@@ -91,6 +104,7 @@ func (p *Pusher) Connect(interrupt <-chan struct{}) error {
 			// Heartbeat
 			err := p.conn.WriteMessage(websocket.PingMessage, []byte{})
 			if err != nil {
+				p.changeState(WebSocketStateDisconnected)
 				return err
 			}
 		case <-interrupt:
@@ -98,12 +112,14 @@ func (p *Pusher) Connect(interrupt <-chan struct{}) error {
 			// waiting (with timeout) for the server to close the connection.
 			err := p.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
+				p.changeState(WebSocketStateClosed)
 				return err
 			}
 			select {
 			case <-done:
 			case <-time.After(time.Second):
 			}
+			p.changeState(WebSocketStateClosed)
 			return nil
 		}
 	}

@@ -87,7 +87,6 @@ func (server *PusherEventServer) runWebsocket(interrupt chan struct{}) error {
 	}
 
 	server.pushereventing.Url = *serverPath
-
 	err = server.pushereventing.Connect(interrupt)
 
 	if err != nil {
