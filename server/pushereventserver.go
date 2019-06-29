@@ -15,10 +15,10 @@ import (
 )
 
 type PusherEventServer struct {
-	client *kahla.Client
-	config *conf.Config
-	pushereventing *pusher.Pusher
-	handler *EventHandler
+	client         *kahla.Client
+	config         *conf.Config
+	pusherEventing *pusher.Pusher
+	handler        *EventHandler
 }
 
 func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject) *PusherEventServer {
@@ -34,7 +34,7 @@ func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject)
 		client: macaronapp.GetVal(reflect.TypeOf(injector.Client)).Interface().(*kahla.Client),
 	}
 
-	server.pushereventing = pusher.New("", server.EventHandler)
+	server.pusherEventing = pusher.New("", server.EventHandler)
 	server.handler = NewEventHandler(macaronapp, injector, server.client)
 
 	return server
@@ -86,8 +86,8 @@ func (server *PusherEventServer) runWebsocket(interrupt chan struct{}) error {
 		return err
 	}
 
-	server.pushereventing.Url = *serverPath
-	err = server.pushereventing.Connect(interrupt)
+	server.pusherEventing.Url = *serverPath
+	err = server.pusherEventing.Connect(interrupt)
 
 	if err != nil {
 		return err
