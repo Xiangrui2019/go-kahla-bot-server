@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
+	"github.com/xiangrui2019/go-kahla-bot-server/cryptojs"
 	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
@@ -37,6 +38,29 @@ func NewEventHandler(macaronapp *macaron.Macaron, injector *injects.BasicInject,
 }
 
 func (h *EventHandler) NewMessageEvent(v *pusher.Pusher_NewMessageEvent) error {
+	log.Println("成功接受了一条消息...")
+	if v.Sender.NickName != h.config.BotConfig.Name {
+		log.Println("消息验证成功, 准备处理消息")
+		aesKey, err := h.getAesKey(v.ConversationId)
+		if err != nil {
+			return err
+		}
+		log.Println("获取AESKEY成功...")
+
+		content, err := cryptojs.AesDecrypt(v.Content, *aesKey)
+		if err != nil {
+			return err
+		}
+		log.Printf("消息解密成功, 消息为: %s", content)
+
+		log.Println("开始处理消息...")
+		err = h.ProcessNewMessageEvent(content, v)
+		log.Println("消息处理完成")
+		if err != nil {
+			return err
+		}
+	}
+	log.Println("消息没有通过验证, 这条消息是机器自动发送的...")
 	return nil
 }
 
@@ -56,6 +80,10 @@ func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEv
 		return err
 	}
 	log.Println("已经同意此用户加入公众号.")
+	return nil
+}
+
+func (h *EventHandler) ProcessNewMessageEvent(content string, v *pusher.Pusher_NewMessageEvent) error {
 	return nil
 }
 
@@ -167,6 +195,26 @@ func (h *EventHandler) getConversationId(Id string) (*uint32, error) {
 	}
 
 	return &response.ConversationId, nil
+}
+
+func (h *EventHandler) getAesKey(conversationId uint32) (*string, error) {
+	response, httpResponse, err := h.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+		Id: conversationId,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return nil, errors.New(response.Message)
+	}
+
+	return &response.Value.AesKey, nil
 }
 
 func (h *EventHandler) getMyRequests() (*[]kahla.Friendship_MyRequestsResponse_Item, error) {

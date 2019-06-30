@@ -61,6 +61,25 @@ func GetBotUserByToken(token string) (*models.BotUser, error) {
 	return user, nil
 }
 
+// 通过Conversation查找Bot用户
+func GetBotUserByConversationId(conversationId uint32) (*models.BotUser, error) {
+	user := &models.BotUser{
+		ConversationId: conversationId,
+	}
+
+	has, err := orm.X.Get(user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !has {
+		return nil, errors.New("user not found")
+	}
+
+	return user, nil
+}
+
 // 获取所有的BotUser
 func GetAllBotUser() (as []*models.BotUser, err error) {
 	err = orm.X.Find(&as)
