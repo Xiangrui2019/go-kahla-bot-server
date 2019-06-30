@@ -2,10 +2,13 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"reflect"
 	"strconv"
+
+	"strings"
 
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/cryptojs"
@@ -84,6 +87,8 @@ func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEv
 }
 
 func (h *EventHandler) ProcessNewMessageEvent(content string, v *pusher.Pusher_NewMessageEvent) error {
+	m, n, x := h.parseMessageContent(content)
+	fmt.Println(m, n, x)
 	return nil
 }
 
@@ -195,6 +200,69 @@ func (h *EventHandler) getConversationId(Id string) (*uint32, error) {
 	}
 
 	return &response.ConversationId, nil
+}
+
+func (h *EventHandler) parseMessageContent(content string) (string, int, string) {
+	switch {
+	case strings.Contains(content, "[img]"):
+		splited := strings.Split(content, "]")[1]
+		filekey := strings.Split(splited, "-")[0]
+		downloadurl := "https://oss.aiursoft.com/download/fromkey/" + filekey
+		return downloadurl, enums.Image, content
+	case strings.Contains(content, "[video]"):
+		filekey := strings.Split(content, "]")[1]
+		downloadurl := "https://oss.aiursoft.com/download/fromkey/" + filekey
+		return downloadurl, enums.Video, content
+	case strings.Contains(content, "[audio]"):
+		splited := strings.Split(content, "]")[1]
+		filekey, err := strconv.Atoi(splited)
+		if err != nil {
+			return "", 0, ""
+		}
+		result, err := h.getFileDownloadAddress(uint32(filekey))
+		if err != nil {
+			return "", 0, ""
+		}
+		downloadurl := strings.ReplaceAll(*result, "audio", "audio.ogg")
+		return downloadurl, enums.Audio, content
+	case strings.Contains(content, "[file]"):
+		splited := strings.Split(content, "]")[1]
+		filekey, err := strconv.Atoi(strings.Split(splited, "-")[0])
+		if err != nil {
+			return "", 0, ""
+		}
+		downloadurl, err := h.getFileDownloadAddress(uint32(filekey))
+		if err != nil {
+			return "", 0, ""
+		}
+		return *downloadurl, enums.File, content
+	default:
+		return content, enums.Text, ""
+	}
+}
+
+func (h *EventHandler) callbacktoServer() error {
+	return nil
+}
+
+func (h *EventHandler) getFileDownloadAddress(fileKey uint32) (*string, error) {
+	response, httpResponse, err := h.client.Files.FileDownloadAddress(&kahla.Files_FileDownloadAddressRequest{
+		FileKey: fileKey,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return nil, errors.New(response.Message)
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	return &response.DownloadPath, nil
 }
 
 func (h *EventHandler) getAesKey(conversationId uint32) (*string, error) {
