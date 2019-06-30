@@ -71,35 +71,27 @@ func (h *EventHandler) WereDeletedEvent(v *pusher.Pusher_WereDeletedEvent) error
 }
 
 func (h *EventHandler) UpdateConversation() error {
-	response, httpResponse, err := h.client.Friendship.Mine()
+	users, err := dao.GetAllBotUser()
 
 	if err != nil {
 		return err
 	}
 
-	if httpResponse.StatusCode != http.StatusOK {
-		return errors.New("status code not 200")
-	}
-
-	if response.Code != enums.ResponseCodeOK {
-		return errors.New(response.Message)
-	}
-
-	allusers, err := dao.GetAllBotUser()
+	mines, err := h.getMines()
 
 	if err != nil {
 		return err
 	}
 
-	for _, v := range allusers {
-		isinkahla := false
-		for _, user := range response.Users {
+	for _, v := range users {
+		x := false
+		for _, user := range *mines {
 			if v.KahlaUserId == user.Id {
-				isinkahla = true
+				x = true
 			}
 		}
 
-		if !isinkahla {
+		if !x {
 			log.Println("删除了当前不存在的好友信息")
 			err := dao.DeleteBotUser(v.Id)
 			return err
@@ -112,7 +104,111 @@ func (h *EventHandler) UpdateConversation() error {
 func (h *EventHandler) AcceptFriendRequest() error {
 	var err1 error
 
+	requests, err := h.getMyRequests()
+
+	if err != nil {
+		return err
+	}
+
+	for _, v := range *requests {
+		if !v.Completed {
+			err := h.acceptCompleteRequest(strconv.Itoa(int(v.Id)))
+
+			if err != nil {
+				if err1 == nil {
+					err1 = err
+				}
+				continue
+			}
+
+			err = h.updateUser(&v)
+
+			if err != nil {
+				if err1 == nil {
+					err1 = err
+				}
+				continue
+			}
+
+			err = h.UpdateConversation()
+
+			if err != nil {
+				if err1 == nil {
+					err1 = err
+				}
+				continue
+			}
+		}
+	}
+
+	return err1
+}
+
+func (h *EventHandler) getConversationId(Id string) (*uint32, error) {
+	response, httpResponse, err := h.client.Friendship.UserDetail(&kahla.Friendship_UserDetailRequest{
+		Id: Id,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return nil, errors.New(response.Message)
+	}
+
+	if response.AreFriends != true {
+		return nil, errors.New("your are not friends")
+	}
+
+	return &response.ConversationId, nil
+}
+
+func (h *EventHandler) getMyRequests() (*[]kahla.Friendship_MyRequestsResponse_Item, error) {
 	response, httpResponse, err := h.client.Friendship.MyRequests()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return nil, errors.New(response.Message)
+	}
+
+	return &response.Items, nil
+}
+
+func (h *EventHandler) getMines() (*[]kahla.Friendship_MineResponse_User, error) {
+	response, httpResponse, err := h.client.Friendship.Mine()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if response.Code != enums.ResponseCodeOK {
+		return nil, errors.New(response.Message)
+	}
+
+	return &response.Users, nil
+}
+
+func (h *EventHandler) acceptCompleteRequest(id string) error {
+	response, httpResponse, err := h.client.Friendship.CompleteRequest(&kahla.Friendship_CompleteRequestRequest{
+		Id: id,
+		Accept: true,
+	})
 
 	if err != nil {
 		return err
@@ -125,128 +221,33 @@ func (h *EventHandler) AcceptFriendRequest() error {
 	if response.Code != enums.ResponseCodeOK {
 		return errors.New(response.Message)
 	}
-CONTINUE:
-	for _, v := range response.Items {
-		if !v.Completed {
-			response, _, err := h.client.Friendship.CompleteRequest(&kahla.Friendship_CompleteRequestRequest{
-				Id: strconv.Itoa(int(v.Id)),
-				Accept: true,
-			})
-			log.Printf("同意了一个好友请求: %d", v.Id)
 
-			if err != nil {
-				if err1 == nil {
-					err1 = err
-				}
-				continue
-			}
+	return nil
+}
 
-			if httpResponse.StatusCode != http.StatusOK {
-				if err1 == nil {
-					err1 = errors.New("status code not 200")
-				}
-				continue
-			}
+func (h *EventHandler) updateUser(v *kahla.Friendship_MyRequestsResponse_Item) error {
+	conversationId, err := h.getConversationId(v.CreatorId)
 
-			if response.Code != enums.ResponseCodeOK {
-				if err1 == nil {
-					err1 = errors.New(response.Message)
-				}
-				continue
-			}
-
-			mines, httpResponse, err := h.client.Friendship.Mine()
-
-			if err != nil {
-				if err1 == nil {
-					err1 = err
-				}
-				continue
-			}
-
-			if httpResponse.StatusCode != http.StatusOK {
-				if err1 == nil {
-					err1 = errors.New("status code not 200")
-				}
-				continue
-			}
-
-			if mines.Code != enums.ResponseCodeOK {
-				if err1 == nil {
-					err1 = errors.New(mines.Message)
-				}
-				continue
-			}
-
-			for _, user := range mines.Users {
-				if user.Id == v.CreatorId {
-					response, httpResponse, err := h.client.Friendship.UserDetail(&kahla.Friendship_UserDetailRequest{
-						Id: user.Id,
-					})
-
-					if err != nil {
-						if err1 == nil {
-							err1 = err
-						}
-						continue CONTINUE
-					}
-
-					if httpResponse.StatusCode != http.StatusOK {
-						if err1 == nil {
-							err1 = errors.New("status code not 200")
-						}
-						continue
-					}
-
-					if response.Code != enums.ResponseCodeOK {
-						if err1 == nil {
-							err1 = err
-						}
-						continue CONTINUE
-					}
-
-					if response.AreFriends != true {
-						if err1 == nil {
-							err1 = errors.New("your are not friends")
-						}
-						continue CONTINUE
-					}
-
-					token, err := h.tokenService.SendToken(response.ConversationId)
-
-					if err != nil {
-						if err1 == nil {
-							err1 = err
-						}
-						continue CONTINUE
-					}
-
-					err = dao.CreateBotUser(&models.BotUser{
-						Token: *token,
-						Nickname: v.Creator.NickName,
-						KahlaUserId: v.Creator.Id,
-						ConversationId: response.ConversationId,
-					})
-
-					if err != nil {
-						if err1 == nil {
-							err1 = err
-						}
-						continue CONTINUE
-					}
-
-					err = h.UpdateConversation()
-
-					if err != nil {
-						if err1 == nil {
-							err1 = err
-						}
-						continue CONTINUE
-					}
-				}
-			}
-		}
+	if err != nil {
+		return err
 	}
 
-	return err1
+	token, err := h.tokenService.SendToken(*conversationId)
+
+	if err != nil {
+		return err
+	}
+
+	err = dao.CreateBotUser(&models.BotUser{
+		Token: *token,
+		Nickname: v.Creator.NickName,
+		KahlaUserId: v.Creator.Id,
+		ConversationId: *conversationId,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

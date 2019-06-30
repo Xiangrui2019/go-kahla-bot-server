@@ -65,14 +65,14 @@ func (s *MessageService) SendMessageByToken(token string, message string) error 
 	return nil
 }
 
-func (s *MessageService) SendImageMessageByToken(token string, fileheader *multipart.FileHeader) error {
+func (s *MessageService) SendImageMessageByToken(token string, file *multipart.FileHeader) error {
 	user, err := dao.GetBotUserByToken(token)
 
 	if err != nil {
 		return err
 	}
 
-	err = s.SendImageMessageByConversationId(user.ConversationId, fileheader)
+	err = s.SendImageMessageByConversationId(user.ConversationId, file)
 
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func (s *MessageService) SendImageMessageByToken(token string, fileheader *multi
 	return nil
 }
 
-func (s *MessageService) SendImageMessageByConversationId(conversationId uint32, fileheader *multipart.FileHeader) error {
+func (s *MessageService) SendImageMessageByConversationId(conversationId uint32, file *multipart.FileHeader) error {
 	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
 		Id: conversationId,
 	})
@@ -98,13 +98,13 @@ func (s *MessageService) SendImageMessageByConversationId(conversationId uint32,
 		return errors.New(conversation.Message)
 	}
 
-	width, height, err := functions.GetImageSize(fileheader)
+	width, height, err := functions.GetImageSize(file)
 
 	if err != nil {
 		return err
 	}
 
-	imagefile, err := fileheader.Open()
+	imagefile, err := file.Open()
 
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (s *MessageService) SendImageMessageByConversationId(conversationId uint32,
 
 	mediaresponse, httpResponse, _ := s.client.Files.UploadMedia(&kahla.Files_UploadMediaRequest{
 		File: imagefile,
-		Name: fileheader.Filename,
+		Name: file.Filename,
 	})
 
 	if httpResponse.StatusCode != http.StatusOK {
@@ -136,14 +136,14 @@ func (s *MessageService) SendImageMessageByConversationId(conversationId uint32,
 	return nil
 }
 
-func (s *MessageService) SendVoiceMessageByToken(token string, fileheader *multipart.FileHeader) error {
+func (s *MessageService) SendVoiceMessageByToken(token string, file *multipart.FileHeader) error {
 	user, err := dao.GetBotUserByToken(token)
 
 	if err != nil {
 		return err
 	}
 
-	err = s.SendVoiceMessageByConversationId(user.ConversationId, fileheader)
+	err = s.SendVoiceMessageByConversationId(user.ConversationId, file)
 
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func (s *MessageService) SendVoiceMessageByToken(token string, fileheader *multi
 	return nil
 }
 
-func (s *MessageService) SendVoiceMessageByConversationId(conversationId uint32, fileheader *multipart.FileHeader) error {
+func (s *MessageService) SendVoiceMessageByConversationId(conversationId uint32, file *multipart.FileHeader) error {
 	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
 		Id: conversationId,
 	})
@@ -169,15 +169,15 @@ func (s *MessageService) SendVoiceMessageByConversationId(conversationId uint32,
 		return errors.New(conversation.Message)
 	}
 
-	voicefile, err := fileheader.Open()
+	voicefile, err := file.Open()
 
 	if err != nil {
 		return err
 	}
 
 	mediaresponse, httpResponse, _ := s.client.Files.UploadFile(&kahla.Files_UploadFileRequest{
-		File: voicefile,
-		Name: fileheader.Filename,
+		File:           voicefile,
+		Name:           file.Filename,
 		ConversationId: conversationId,
 	})
 
