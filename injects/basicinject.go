@@ -1,18 +1,19 @@
 package injects
 
 import (
+	"log"
+	"os"
+
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"gopkg.in/macaron.v1"
-	"log"
-	"os"
 )
 
 type BasicInject struct {
 	Context *macaron.Macaron
-	Logger *log.Logger
-	Client *kahla.Client
-	Config *conf.Config
+	Logger  *log.Logger
+	Client  *kahla.Client
+	Config  *conf.Config
 }
 
 func NewInjector(ctx *macaron.Macaron) *BasicInject {
@@ -20,9 +21,9 @@ func NewInjector(ctx *macaron.Macaron) *BasicInject {
 
 	return &BasicInject{
 		Context: ctx,
-		Logger: log.New(os.Stdout, "[kahla-bot] ", 0),
-		Client: kahla.NewClient(c.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com"),
-		Config: c,
+		Logger:  log.New(os.Stdout, "[kahla-bot] ", 0),
+		Client:  kahla.NewClient(c.BotConfig.KahlaServer, "https://oss.cdn.aiursoft.com"),
+		Config:  c,
 	}
 }
 

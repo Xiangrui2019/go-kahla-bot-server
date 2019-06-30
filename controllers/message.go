@@ -1,17 +1,18 @@
 package controllers
 
 import (
+	"reflect"
+
 	"github.com/xiangrui2019/go-kahla-bot-server/api"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/services"
 	"gopkg.in/macaron.v1"
-	"reflect"
 )
 
 type MessageController struct {
 	messageService *services.MessageService
-	client *kahla.Client
+	client         *kahla.Client
 }
 
 func NewMessageController(macaronapp *macaron.Macaron, injector *injects.BasicInject) *MessageController {
@@ -20,7 +21,7 @@ func NewMessageController(macaronapp *macaron.Macaron, injector *injects.BasicIn
 
 	return &MessageController{
 		messageService: services.NewMessageService(client),
-		client: client,
+		client:         client,
 	}
 }
 
@@ -29,14 +30,14 @@ func (c *MessageController) SendText(context *macaron.Context, model api.SendTex
 
 	if err != nil {
 		context.JSON(200, api.SendTextResponseModel{
-			Code: 500,
+			Code:    500,
 			Message: err.Error(),
 		})
 		return
 	}
 
 	context.JSON(200, api.SendTextResponseModel{
-		Code: 200,
+		Code:    200,
 		Message: "Successfully sent a message.",
 	})
 }
@@ -46,14 +47,14 @@ func (c *MessageController) SendImage(context *macaron.Context, model api.SendIm
 
 	if err != nil {
 		context.JSON(200, api.SendImageResponseModel{
-			Code: 500,
+			Code:    500,
 			Message: err.Error(),
 		})
 		return
 	}
 
 	context.JSON(200, api.SendImageResponseModel{
-		Code: 200,
+		Code:    200,
 		Message: "Successfully sent a message.",
 	})
 }
@@ -63,14 +64,14 @@ func (c *MessageController) SendVideo(context *macaron.Context, model api.SendVi
 
 	if err != nil {
 		context.JSON(200, api.SendVideoResponseModel{
-			Code: 500,
+			Code:    500,
 			Message: err.Error(),
 		})
 		return
 	}
 
 	context.JSON(200, api.SendVideoResponseModel{
-		Code: 200,
+		Code:    200,
 		Message: "Successfully sent a message.",
 	})
 }
@@ -80,14 +81,14 @@ func (c *MessageController) SendFile(context *macaron.Context, model api.SendFil
 
 	if err != nil {
 		context.JSON(200, api.SendFileResponseModel{
-			Code: 500,
+			Code:    500,
 			Message: err.Error(),
 		})
 		return
 	}
 
 	context.JSON(200, api.SendFileResponseModel{
-		Code: 200,
+		Code:    200,
 		Message: "Successfully sent a message.",
 	})
 }
@@ -97,14 +98,14 @@ func (c *MessageController) SendVoice(context *macaron.Context, model api.SendVo
 
 	if err != nil {
 		context.JSON(200, api.SendImageResponseModel{
-			Code: 500,
+			Code:    500,
 			Message: err.Error(),
 		})
 		return
 	}
 
 	context.JSON(200, api.SendImageResponseModel{
-		Code: 200,
+		Code:    200,
 		Message: "Successfully sent a message.",
 	})
 }

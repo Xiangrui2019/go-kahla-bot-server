@@ -2,6 +2,7 @@ package dao
 
 import (
 	"errors"
+
 	"github.com/xiangrui2019/go-kahla-bot-server/models"
 	"github.com/xiangrui2019/go-kahla-bot-server/orm"
 )
@@ -11,7 +12,6 @@ func CreateBotUser(user *models.BotUser) error {
 	_, err := orm.X.Insert(user)
 	return err
 }
-
 
 // 删除Bot用户
 func DeleteBotUser(id int64) error {
@@ -30,7 +30,7 @@ func GetBotUserById(id int64) (*models.BotUser, error) {
 	user := &models.BotUser{}
 
 	has, err := orm.X.Id(id).Get(user)
-	
+
 	if err != nil {
 		return nil, err
 	}

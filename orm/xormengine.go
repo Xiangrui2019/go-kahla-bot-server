@@ -1,11 +1,12 @@
 package orm
 
 import (
+	"log"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/models"
-	"log"
 )
 
 var X *xorm.Engine

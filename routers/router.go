@@ -7,13 +7,13 @@ import (
 
 type Router struct {
 	context *macaron.Macaron
-	inject *injects.BasicInject
+	inject  *injects.BasicInject
 }
 
 func NewRouter(ctx *macaron.Macaron, injector *injects.BasicInject) *Router {
 	return &Router{
 		context: ctx,
-		inject: injector,
+		inject:  injector,
 	}
 }
 

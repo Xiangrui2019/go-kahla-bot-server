@@ -2,6 +2,11 @@ package server
 
 import (
 	"errors"
+	"log"
+	"net/http"
+	"reflect"
+	"strconv"
+
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/dao"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
@@ -11,16 +16,12 @@ import (
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
 	"github.com/xiangrui2019/go-kahla-bot-server/services"
 	"gopkg.in/macaron.v1"
-	"log"
-	"net/http"
-	"reflect"
-	"strconv"
 )
 
 type EventHandler struct {
-	config *conf.Config
-	client *kahla.Client
-	tokenService *services.TokenService
+	config            *conf.Config
+	client            *kahla.Client
+	tokenService      *services.TokenService
 	friendRequestChan chan struct{}
 }
 
@@ -206,7 +207,7 @@ func (h *EventHandler) getMines() (*[]kahla.Friendship_MineResponse_User, error)
 
 func (h *EventHandler) acceptCompleteRequest(id string) error {
 	response, httpResponse, err := h.client.Friendship.CompleteRequest(&kahla.Friendship_CompleteRequestRequest{
-		Id: id,
+		Id:     id,
 		Accept: true,
 	})
 
@@ -239,9 +240,9 @@ func (h *EventHandler) updateUser(v *kahla.Friendship_MyRequestsResponse_Item) e
 	}
 
 	err = dao.CreateBotUser(&models.BotUser{
-		Token: *token,
-		Nickname: v.Creator.NickName,
-		KahlaUserId: v.Creator.Id,
+		Token:          *token,
+		Nickname:       v.Creator.NickName,
+		KahlaUserId:    v.Creator.Id,
 		ConversationId: *conversationId,
 	})
 

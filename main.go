@@ -3,16 +3,17 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"reflect"
+
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
 	_ "github.com/xiangrui2019/go-kahla-bot-server/orm"
 	"github.com/xiangrui2019/go-kahla-bot-server/routers"
 	"github.com/xiangrui2019/go-kahla-bot-server/server"
 	"gopkg.in/macaron.v1"
-	"log"
-	"net/http"
-	"os"
-	"reflect"
 )
 
 func main() {
@@ -66,7 +67,7 @@ func main() {
 	go func() {
 		err := errors.New("inital error to run")
 
-		for err != nil  {
+		for err != nil {
 			err = pusherserver.Run(interrupt2)
 
 			if err != nil {
@@ -77,7 +78,7 @@ func main() {
 
 	// 给馬卡龙实例创建Go HTTP服务器
 	httpServer := http.Server{
-		Addr: fmt.Sprintf("%s:%d", config.Host, config.Port),
+		Addr:    fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Handler: app,
 	}
 

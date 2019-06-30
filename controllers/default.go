@@ -6,18 +6,15 @@ import (
 )
 
 type MainController struct {
-
 }
 
 func NewMainController() *MainController {
-	return &MainController{
-
-	}
+	return &MainController{}
 }
 
-func (c *MainController) Index(context *macaron.Context)  {
+func (c *MainController) Index(context *macaron.Context) {
 	context.JSON(200, api.MainIndexModel{
-		Code: 200,
+		Code:    200,
 		Message: "Welcome to the kahla robot server.",
 	})
 }

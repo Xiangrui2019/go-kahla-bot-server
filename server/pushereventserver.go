@@ -3,15 +3,16 @@ package server
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
+	"reflect"
+
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
 	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"github.com/xiangrui2019/go-kahla-bot-server/injects"
 	"github.com/xiangrui2019/go-kahla-bot-server/kahla"
 	"github.com/xiangrui2019/go-kahla-bot-server/pusher"
 	"gopkg.in/macaron.v1"
-	"log"
-	"net/http"
-	"reflect"
 )
 
 type PusherEventServer struct {
@@ -42,7 +43,7 @@ func NewPusherServer(macaronapp *macaron.Macaron, injector *injects.BasicInject)
 
 func (server *PusherEventServer) login() error {
 	response, httpResponse, err := server.client.Auth.AuthByPassword(&kahla.Auth_AuthByPasswordRequest{
-		Email: server.config.BotConfig.Email,
+		Email:    server.config.BotConfig.Email,
 		Password: server.config.BotConfig.Password,
 	})
 

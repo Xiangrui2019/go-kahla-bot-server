@@ -7,21 +7,21 @@ import (
 
 // 定义配置结构体
 type Config struct {
-	Host string `toml:"HOST"`
-	Port int `toml:"PORT"`
-	Env string `toml:"ENV"`
-	BotConfig Bot `toml:"bot"`
+	Host          string `toml:"HOST"`
+	Port          int    `toml:"PORT"`
+	Env           string `toml:"ENV"`
+	BotConfig     Bot    `toml:"bot"`
 	CorsOriginURL string `toml:"CORS_ORIGIN_URL"`
-	MySqlDSN string `toml:"MYSQL_DSN"`
-	TokenLength int `toml:"TOKEN_LENGTH"`
+	MySqlDSN      string `toml:"MYSQL_DSN"`
+	TokenLength   int    `toml:"TOKEN_LENGTH"`
 }
 
 type Bot struct {
-	Name string `toml:"name"`
-	Email string `toml:"email"`
-	Password string `toml:"password"`
-	KahlaServer string `toml:"kahlaserver"`
-	CallbackServer string `toml:"callbackserver"`
+	Name                    string `toml:"name"`
+	Email                   string `toml:"email"`
+	Password                string `toml:"password"`
+	KahlaServer             string `toml:"kahlaserver"`
+	CallbackServer          string `toml:"callbackserver"`
 	MessageCallbackEndpoint string `toml:"messagecallbackendpoint"`
 }
 

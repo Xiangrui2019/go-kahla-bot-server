@@ -18,18 +18,18 @@ const (
 type EventHandler func(interface{})
 
 type Pusher struct {
-	conn          *websocket.Conn
-	Url           string
-	EventHandlers []EventHandler
+	conn            *websocket.Conn
+	Url             string
+	EventHandlers   []EventHandler
 	State           int
 	StateChangeChan chan int
 }
 
 func New(url string, eventHandlers ...EventHandler) *Pusher {
 	return &Pusher{
-		Url:           url,
-		EventHandlers: eventHandlers,
-		State: WebSocketStateNew,
+		Url:             url,
+		EventHandlers:   eventHandlers,
+		State:           WebSocketStateNew,
 		StateChangeChan: make(chan int),
 	}
 }

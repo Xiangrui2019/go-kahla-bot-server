@@ -2,8 +2,6 @@
 // source: events.proto
 package pusher
 
-import ()
-
 type Pusher_EventType int32
 
 const (
