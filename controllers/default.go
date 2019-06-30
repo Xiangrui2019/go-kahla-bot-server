@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/xiangrui2019/go-kahla-bot-server/api"
-	"github.com/xiangrui2019/go-kahla-bot-server/enums"
 	"gopkg.in/macaron.v1"
 )
 
@@ -18,7 +17,7 @@ func NewMainController() *MainController {
 
 func (c *MainController) Index(context *macaron.Context)  {
 	context.JSON(200, api.MainIndexModel{
-		Code: enums.ResponseCodeOK,
+		Code: 200,
 		Message: "Welcome to the kahla robot server.",
 	})
 }

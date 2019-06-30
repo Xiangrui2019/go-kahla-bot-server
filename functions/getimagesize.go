@@ -11,6 +11,8 @@ import (
 func GetImageSize(file *multipart.FileHeader) (int, int, error) {
 	fp, err := file.Open()
 
+	defer fp.Close()
+
 	if err != nil {
 		return 0, 0, err
 	}

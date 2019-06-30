@@ -6,6 +6,4 @@ const (
 	ResponseCodeNoContent
 	ResponseCodeInvalidAccessToken
 	ResponseCodeSendMessageFailed
-	ImageError
-	VoiceError
 )

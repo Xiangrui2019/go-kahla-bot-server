@@ -82,20 +82,10 @@ func (s *MessageService) SendImageMessageByToken(token string, file *multipart.F
 }
 
 func (s *MessageService) SendImageMessageByConversationId(conversationId uint32, file *multipart.FileHeader) error {
-	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
-		Id: conversationId,
-	})
+	conversation, err := s.getConversation(conversationId)
 
 	if err != nil {
 		return err
-	}
-
-	if httpResponse.StatusCode != http.StatusOK {
-		return errors.New("status code not 200")
-	}
-
-	if conversation.Code != enums.ResponseCodeOK {
-		return errors.New(conversation.Message)
 	}
 
 	width, height, err := functions.GetImageSize(file)
@@ -104,28 +94,53 @@ func (s *MessageService) SendImageMessageByConversationId(conversationId uint32,
 		return err
 	}
 
-	imagefile, err := file.Open()
+	fileKey, err := s.uploadMedia(file)
 
 	if err != nil {
 		return err
 	}
 
-	mediaresponse, httpResponse, _ := s.client.Files.UploadMedia(&kahla.Files_UploadMediaRequest{
-		File: imagefile,
-		Name: file.Filename,
-	})
+	message := fmt.Sprintf("[img]%s-%s-%s-0", *fileKey, strconv.Itoa(width), strconv.Itoa(height))
 
-	if httpResponse.StatusCode != http.StatusOK {
-		return errors.New("status code not 200")
+	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
+
+	if err != nil {
+		return err
 	}
 
-	if mediaresponse.Code != enums.ResponseCodeOK {
-		return errors.New(conversation.Message)
+	return nil
+}
+
+func (s *MessageService) SendVideoMessageByToken(token string, file *multipart.FileHeader) error {
+	user, err := dao.GetBotUserByToken(token)
+
+	if err != nil {
+		return err
 	}
 
-	fileKey := functions.ParseFileKey(mediaresponse.DownloadPath)
+	err = s.SendVideoMessageByConversationId(user.ConversationId, file)
 
-	message := fmt.Sprintf("[img]%s-%s-%s-0", fileKey, strconv.Itoa(width), strconv.Itoa(height))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *MessageService) SendVideoMessageByConversationId(conversationId uint32, file *multipart.FileHeader) error {
+	conversation, err := s.getConversation(conversationId)
+
+	if err != nil {
+		return err
+	}
+
+	fileKey, err := s.uploadMedia(file)
+
+	if err != nil {
+		return err
+	}
+
+	message := fmt.Sprintf("[video]%s", *fileKey)
 
 	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
 
@@ -153,43 +168,19 @@ func (s *MessageService) SendVoiceMessageByToken(token string, file *multipart.F
 }
 
 func (s *MessageService) SendVoiceMessageByConversationId(conversationId uint32, file *multipart.FileHeader) error {
-	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
-		Id: conversationId,
-	})
+	conversation, err := s.getConversation(conversationId)
 
 	if err != nil {
 		return err
 	}
 
-	if httpResponse.StatusCode != http.StatusOK {
-		return errors.New("status code not 200")
-	}
-
-	if conversation.Code != enums.ResponseCodeOK {
-		return errors.New(conversation.Message)
-	}
-
-	voicefile, err := file.Open()
+	fileKey, err := s.uploadFile(file, conversationId)
 
 	if err != nil {
 		return err
 	}
 
-	mediaresponse, httpResponse, _ := s.client.Files.UploadFile(&kahla.Files_UploadFileRequest{
-		File:           voicefile,
-		Name:           file.Filename,
-		ConversationId: conversationId,
-	})
-
-	if httpResponse.StatusCode != http.StatusOK {
-		return errors.New("status code not 200")
-	}
-
-	if mediaresponse.Code != enums.ResponseCodeOK {
-		return errors.New(conversation.Message)
-	}
-
-	message := fmt.Sprintf("[audio]%d", mediaresponse.FileKey)
+	message := fmt.Sprintf("[audio]%s", *fileKey)
 
 	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
 
@@ -225,4 +216,79 @@ func (s *MessageService) SendRawMessage(conversationId uint32, message string, A
 	}
 
 	return nil
+}
+
+func (s *MessageService) getConversation(conversationId uint32) (*kahla.Conversation_ConversationDetailResponse, error) {
+	conversation, httpResponse, err := s.client.Conversation.ConversationDetail(&kahla.Conversation_ConversationDetailRequest{
+		Id: conversationId,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if conversation.Code != enums.ResponseCodeOK {
+		return nil, errors.New(conversation.Message)
+	}
+
+	return conversation, nil
+}
+
+func (s *MessageService) uploadMedia(file *multipart.FileHeader) (*string, error) {
+	media, err := file.Open()
+
+	defer media.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	mediaresp, httpResponse, _ := s.client.Files.UploadMedia(&kahla.Files_UploadMediaRequest{
+		File: media,
+		Name: file.Filename,
+	})
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if mediaresp.Code != enums.ResponseCodeOK {
+		return nil, errors.New(mediaresp.Message)
+	}
+
+	fileKey := functions.ParseFileKey(mediaresp.DownloadPath)
+
+	return &fileKey, nil
+}
+
+func (s *MessageService) uploadFile(file *multipart.FileHeader, conversationId uint32) (*string, error) {
+	filex, err := file.Open()
+
+	defer filex.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	fileresp, httpResponse, _ := s.client.Files.UploadFile(&kahla.Files_UploadFileRequest{
+		File:           filex,
+		Name:           file.Filename,
+		ConversationId: conversationId,
+	})
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New("status code not 200")
+	}
+
+	if fileresp.Code != enums.ResponseCodeOK {
+		return nil, errors.New(fileresp.Message)
+	}
+
+	fileKey := strconv.Itoa(int(fileresp.FileKey))
+
+	return &fileKey, nil
 }
