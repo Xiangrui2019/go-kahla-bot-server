@@ -75,8 +75,21 @@ func (c *MessageController) SendVideo(context *macaron.Context, model api.SendVi
 	})
 }
 
-func (c *MessageController) SendFile(context *macaron.Context) {
+func (c *MessageController) SendFile(context *macaron.Context, model api.SendFileRequestModel) {
+	err := c.messageService.SendFileMessageByConversationId(130, model.File)
 
+	if err != nil {
+		context.JSON(200, api.SendFileResponseModel{
+			Code: 500,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	context.JSON(200, api.SendFileResponseModel{
+		Code: 200,
+		Message: "Successfully sent a message.",
+	})
 }
 
 func (c *MessageController) SendVoice(context *macaron.Context, model api.SendVoiceRequestModel) {

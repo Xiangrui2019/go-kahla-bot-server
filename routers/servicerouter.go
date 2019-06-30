@@ -17,10 +17,11 @@ func ConfigureServiceRouting(context *macaron.Macaron, injector *injects.BasicIn
 	context.Any("/home", maincontroller.RedirectHome)
 
 	context.Group("/message/", func() {
-		context.Post("/sendtext", binding.Form(api.SendTextRequestModel{}), messagecontroller.SendText)
-		context.Post("/sendimage", binding.MultipartForm(api.SendImageRequestModel{}), messagecontroller.SendImage)
-		context.Post("/sendvoice", binding.MultipartForm(api.SendVoiceRequestModel{}), messagecontroller.SendVoice)
-		context.Post("/sendvideo", binding.MultipartForm(api.SendVideoRequestModel{}), messagecontroller.SendVideo)
+		context.Post("/sendtext", binding.Bind(api.SendTextRequestModel{}), messagecontroller.SendText)
+		context.Post("/sendimage", binding.Bind(api.SendImageRequestModel{}), messagecontroller.SendImage)
+		context.Post("/sendvoice", binding.Bind(api.SendVoiceRequestModel{}), messagecontroller.SendVoice)
+		context.Post("/sendvideo", binding.Bind(api.SendVideoRequestModel{}), messagecontroller.SendVideo)
+		context.Post("/sendfile", binding.Bind(api.SendFileRequestModel{}), messagecontroller.SendFile)
 	})
 
 	return nil

@@ -151,6 +151,52 @@ func (s *MessageService) SendVideoMessageByConversationId(conversationId uint32,
 	return nil
 }
 
+func (s *MessageService) SendFileMessageByToken(token string, file *multipart.FileHeader) error {
+	user, err := dao.GetBotUserByToken(token)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.SendFileMessageByConversationId(user.ConversationId, file)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *MessageService) SendFileMessageByConversationId(conversationId uint32, file *multipart.FileHeader) error {
+	conversation, err := s.getConversation(conversationId)
+
+	if err != nil {
+		return err
+	}
+
+	fileKey, err := s.uploadFile(file, conversationId)
+
+	if err != nil {
+		return err
+	}
+
+	fileSize, err := functions.CalcFileSize(file)
+
+	if err != nil {
+		return err
+	}
+
+	message := fmt.Sprintf("[file]%s-%s-%s", *fileKey, file.Filename, *fileSize)
+
+	err = s.SendRawMessage(conversationId, message, conversation.Value.AesKey)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *MessageService) SendVoiceMessageByToken(token string, file *multipart.FileHeader) error {
 	user, err := dao.GetBotUserByToken(token)
 
