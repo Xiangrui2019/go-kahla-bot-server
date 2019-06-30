@@ -253,7 +253,7 @@ func (h *EventHandler) parseMessageContent(content string) (string, int, string)
 	}
 }
 
-func (h *EventHandler) callbacktoServer(username string, content string, content_type int, rawcontent string, token string, conversationId uint32) error {
+func (h *EventHandler) buildcallbackParam(username string, content string, content_type int, rawcontent string, token string, conversationId uint32) url.Values {
 	v := url.Values{}
 	v.Add("username", username)
 	v.Add("message", content)
@@ -261,7 +261,11 @@ func (h *EventHandler) callbacktoServer(username string, content string, content
 	v.Add("rawmessage", rawcontent)
 	v.Add("token", token)
 	v.Add("conversationId", strconv.Itoa(int(conversationId)))
+	return v
+}
 
+func (h *EventHandler) callbacktoServer(username string, content string, content_type int, rawcontent string, token string, conversationId uint32) error {
+	v := h.buildcallbackParam(username, content, content_type, rawcontent, token, conversationId)
 	serverurl := fmt.Sprintf("%s%s", h.config.BotConfig.CallbackServer, h.config.BotConfig.MessageCallbackEndpoint)
 
 	req, err := http.NewRequest("POST", serverurl, strings.NewReader(v.Encode()))
