@@ -97,7 +97,6 @@ func (p *Pusher) Connect(interrupt <-chan struct{}) error {
 				p.changeState(WebSocketStateDisconnected)
 				return err
 			default:
-				panic("cannot reach")
 				return nil
 			}
 		case <-ticker.C:
