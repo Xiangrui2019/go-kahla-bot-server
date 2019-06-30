@@ -15,6 +15,7 @@ type MessageController struct {
 }
 
 func NewMessageController(macaronapp *macaron.Macaron, injector *injects.BasicInject) *MessageController {
+	// 通过反射获取卡拉client服务
 	client := macaronapp.GetVal(reflect.TypeOf(injector.Client)).Interface().(*kahla.Client)
 
 	return &MessageController{
