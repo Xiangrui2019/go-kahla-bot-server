@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 
+	"net/url"
 	"strings"
 
 	"github.com/xiangrui2019/go-kahla-bot-server/conf"
@@ -26,13 +27,15 @@ type EventHandler struct {
 	config            *conf.Config
 	client            *kahla.Client
 	tokenService      *services.TokenService
+	httpclient        *http.Client
 	friendRequestChan chan struct{}
 }
 
 func NewEventHandler(macaronapp *macaron.Macaron, injector *injects.BasicInject, cilen *kahla.Client) *EventHandler {
 	handler := &EventHandler{
-		config: macaronapp.GetVal(reflect.TypeOf(injector.Config)).Interface().(*conf.Config),
-		client: cilen,
+		config:     macaronapp.GetVal(reflect.TypeOf(injector.Config)).Interface().(*conf.Config),
+		client:     cilen,
+		httpclient: &http.Client{},
 	}
 
 	handler.tokenService = services.NewTokenService(macaronapp, injector, handler.client)
@@ -87,8 +90,17 @@ func (h *EventHandler) NewFriendRequestEvent(v *pusher.Pusher_NewFriendRequestEv
 }
 
 func (h *EventHandler) ProcessNewMessageEvent(content string, v *pusher.Pusher_NewMessageEvent) error {
-	m, n, x := h.parseMessageContent(content)
-	fmt.Println(m, n, x)
+	message, messagetype, rawmessage := h.parseMessageContent(content)
+	user, err := dao.GetBotUserByConversationId(v.ConversationId)
+	if err != nil {
+		return err
+	}
+	err = h.callbacktoServer(v.Sender.NickName, message, messagetype, rawmessage, user.Token, v.ConversationId)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -241,7 +253,34 @@ func (h *EventHandler) parseMessageContent(content string) (string, int, string)
 	}
 }
 
-func (h *EventHandler) callbacktoServer() error {
+func (h *EventHandler) callbacktoServer(username string, content string, content_type int, rawcontent string, token string, conversationId uint32) error {
+	v := url.Values{}
+	v.Add("username", username)
+	v.Add("message", content)
+	v.Add("messagetype", strconv.Itoa(content_type))
+	v.Add("rawmessage", rawcontent)
+	v.Add("token", token)
+	v.Add("conversationId", strconv.Itoa(int(conversationId)))
+
+	serverurl := fmt.Sprintf("%s%s", h.config.BotConfig.CallbackServer, h.config.BotConfig.MessageCallbackEndpoint)
+
+	req, err := http.NewRequest("POST", serverurl, strings.NewReader(v.Encode()))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := h.httpclient.Do(req)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("status code not 200")
+	}
+
 	return nil
 }
 
