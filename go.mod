@@ -10,9 +10,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-xorm/xorm v0.7.3
 	github.com/gorilla/websocket v1.4.0
-	github.com/malisit/kolpa v0.0.0-20171128201422-10c4658a62cb
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
-	github.com/stretchr/testify v1.3.0
 	gopkg.in/ini.v1 v1.42.0 // indirect
 	gopkg.in/macaron.v1 v1.3.2
 )
