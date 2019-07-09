@@ -18,7 +18,7 @@ TOKEN_LENGTH = 6
 
 # 机器人设置
 [bot]
-name = "孔祥瑞"
+name = "Go Go Go"
 email = "xiangrui@aiursoft.com"
 password = "Xr111900"
 kahlaserver = "https://staging.server.kahla.app"

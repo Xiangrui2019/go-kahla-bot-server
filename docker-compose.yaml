@@ -1,0 +1,10 @@
+version: "2"
+
+services:
+  go-kahla-bot-server:
+    image: go-kahla-bot-server
+    restart: always
+    volumes: 
+      - ./config.toml:/app/config.toml
+    ports:
+      - 8080:8080

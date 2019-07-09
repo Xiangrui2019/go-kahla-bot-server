@@ -16,3 +16,4 @@ vendor/
 .DS_Store
 go.sum
 go-kahla-bot-server
+main

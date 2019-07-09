@@ -1,6 +1,7 @@
 package kahla
 
 import (
+	"crypto/tls"
 	"net/http"
 
 	"net/http/cookiejar"
@@ -19,7 +20,10 @@ type Client struct {
 }
 
 func NewClient(baseUrl string, ossUrl string) *Client {
-	client := &http.Client{}
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: transport}
 	client.Jar, _ = cookiejar.New(nil)
 	return &Client{
 		client:       client,
