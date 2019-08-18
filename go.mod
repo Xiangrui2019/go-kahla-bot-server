@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/Unknwon/com v0.0.0-20190321035513-0fed4efef755 // indirect
+	github.com/unknwon/com v0.0.0-20190321035513-0fed4efef755 // indirect
 	github.com/go-macaron/binding v0.0.0-20170611065819-ac54ee249c27
 	github.com/go-macaron/inject v0.0.0-20160627170012-d8a0b8677191 // indirect
 	github.com/go-sql-driver/mysql v1.4.1
